@@ -1,0 +1,188 @@
+---
+import { css } from "css";
+import { Category, PaymentMethod } from "lib/client";
+
+const { id } = Astro.props;
+---
+
+<dialog
+	id={id}
+	class={css({
+		width: "100vw",
+		height: "100vh",
+		maxHeight: "100vh",
+		maxWidth: "100vw",
+		backgroundColor: "rgba(0, 0, 0, 0.5)",
+	})}
+>
+	<form
+		id="add-transaction-form"
+		class={css({
+			position: "fixed",
+			bottom: 0,
+			backgroundColor: "white",
+			fontSize: "md",
+			paddingTop: 2,
+			shadow: "0px -5px 15px 0px rgba(0, 0, 0, 0.3)",
+			width: "100%",
+			roundedTop: "md",
+			animation: "slideFromBottom 0.2s ease-out",
+		})}
+	>
+		<div
+			class={css({
+				display: "flex",
+				flexDirection: "column",
+				paddingX: 4,
+				paddingY: 2,
+				"& > * + *": {
+					marginTop: 2,
+				},
+				"& > *": {
+					minHeight: 0,
+				},
+				"& > label": {
+					display: "grid",
+					gridTemplateColumns: "1fr 2fr",
+				},
+			})}
+		>
+			<label
+				class={css({
+					alignItems: "center",
+				})}
+			>
+				<span>내용</span>
+				<input
+					class={css({
+						backgroundColor: "gray.100",
+						rounded: "sm",
+						paddingX: 2,
+						minWidth: 0,
+						height: "2.5rem",
+					})}
+					type="text"
+					name="description"
+					required
+				/>
+			</label>
+			<label
+				class={css({
+					alignItems: "center",
+				})}
+			>
+				<span>금액</span>
+				<input
+					class={css({
+						backgroundColor: "gray.100",
+						rounded: "sm",
+						paddingX: 2,
+						height: "2.5rem",
+						minWidth: 0,
+					})}
+					type="number"
+					name="amount"
+					required
+				/>
+			</label>
+			<label
+				class={css({
+					width: "100%",
+					alignItems: "center",
+				})}
+			>
+				<span>날짜</span>
+				<input
+					class={css({
+						backgroundColor: "gray.100",
+						rounded: "sm",
+						paddingX: 2,
+						height: "2.5rem",
+					})}
+					type="date"
+					name="date"
+					value={new Date().toISOString().split("T")[0]}
+					required
+				/>
+			</label>
+			<label
+				class={css({
+					alignItems: "center",
+				})}
+			>
+				<span>분류</span>
+				<select
+					class={css({
+						backgroundColor: "gray.100",
+						rounded: "sm",
+						paddingX: 2,
+						height: "2.5rem",
+					})}
+					name="category"
+				>
+					<option value={Category.Living}>생활비</option>
+					<option value={Category.Tribute}>경조사비</option>
+					<option value={Category.Enjoy}>문화/여행비</option>
+					<option value={Category.Saving}>저축</option>
+					<option value={Category.Excuse}>말랑 비자금</option>
+				</select>
+			</label>
+			<label
+				class={css({
+					alignItems: "center",
+				})}
+			>
+				<span>결제수단</span>
+				<select
+					class={css({
+						backgroundColor: "gray.100",
+						rounded: "sm",
+						paddingX: 2,
+						height: "2.5rem",
+					})}
+					name="paymentMethod"
+				>
+					{Object.entries(PaymentMethod).map(([key, value]) => (
+						<option value={key}>{value}</option>
+					))}
+					>
+				</select>
+			</label>
+		</div>
+		<div
+			class={css({
+				height: "10vh",
+				display: "flex",
+				padding: 2,
+			})}
+		>
+			<button
+				class={css({
+					height: "100%",
+					width: "100%",
+					fontSize: "xl",
+					fontWeight: "bold",
+					rounded: "md",
+					boxShadow: "xl",
+					backgroundColor: "black",
+					color: "white",
+					_active: {
+						scale: 0.98,
+					},
+				})}
+			>
+				등록하기
+			</button>
+		</div>
+	</form>
+</dialog>
+
+<script>
+	const form = document.getElementById(
+		"add-transaction-form",
+	) as HTMLFormElement;
+
+	form.addEventListener("click", (event) => {
+		event.stopPropagation();
+	});
+</script>

@@ -1,0 +1,137 @@
+---
+import Table from "./_table.astro";
+import FormOpenButton from "./_form-open-button.astro";
+import AddTransactionForm from "./_add-transaction-form.astro";
+import { type TransactionDto } from "lib/client";
+import Layout from "./_layout.astro";
+import {css} from "css";
+
+async function fetchTransactions({ start }: { start: string }) {
+	return (await fetch(`${Astro.url}/api/transactions/${start}.json`).then(
+		(response) => response.json(),
+	)) as { data: TransactionDto[] };
+}
+
+const initialTransactions = await fetchTransactions({ start: "0" });
+---
+<Layout>
+	<div class={css({
+    height: "90vh",
+	})}>
+		<Table transactions={initialTransactions.data} />
+	</div>
+	<FormOpenButton id="form-open-button" />
+	<AddTransactionForm id="add-transaction" />
+</Layout>
+
+<style>
+	@keyframes tempBgColorChange {
+		from {
+			background-color: #d9f99d;
+		}
+	}
+</style>
+
+<script>
+	const formOpenButton = document.getElementById(
+		"form-open-button",
+	) as HTMLButtonElement;
+
+	const addTransactionDialog = document.getElementById(
+		"add-transaction",
+	) as HTMLDialogElement;
+
+	const addTransactionForm = document.querySelector(
+		"#add-transaction > form",
+	) as HTMLFormElement;
+
+	function getDateFromAnchorElement(a: HTMLAnchorElement) {
+		const span = a.querySelector("span") as HTMLSpanElement;
+		return new Date(span.textContent!);
+	}
+
+	function createAnchor(data: any) {
+		const a = document.createElement("a");
+
+		a.setAttribute("href", `/transactions/${data.id}`);
+
+		a.innerHTML = `
+			<span>${data.date}</span>
+			<span>${data.description}</span>
+			<span>${data.amount}</span>
+		`;
+
+		a.style.animation = "tempBgColorChange 0.8s ease-in-out forwards";
+
+		return a;
+	}
+
+	addTransactionForm.addEventListener("submit", async (event) => {
+		event.preventDefault();
+
+		const formData = new FormData(addTransactionForm);
+		const data = Object.fromEntries(formData.entries());
+		const tbody = document.getElementById("tbody") as HTMLDivElement;
+		const allRows = tbody.getElementsByTagName("a");
+
+		await fetch("/api/transactions.json",
+			{
+				method: 'POST',
+				headers: {'Content-Type':'application/json'},
+				body: JSON.stringify(data),
+			}
+		).then((response) => response.json());
+
+		const a = createAnchor(data);
+
+		let inserted = false;
+
+		for (const r of allRows) {
+				const date = getDateFromAnchorElement(r);
+
+			if (new Date(data.date as string) >= date) {
+					tbody.insertBefore(a, r);
+
+					a.scrollIntoView({
+						block: "center",
+						behavior: "instant",
+					});
+
+					closeDialog();
+
+					inserted = true;
+
+					return;
+				}
+		}
+
+		if (!inserted) {
+
+			tbody.appendChild(a);
+
+			closeDialog();
+
+			return;
+		}
+	});
+
+	function closeDialog() {
+		addTransactionDialog.close();
+		formOpenButton.style.display = "flex";
+	}
+
+	function openDialog() {
+		formOpenButton.style.display = "none";
+		addTransactionDialog.showModal();
+	}
+
+	formOpenButton.addEventListener("click", () => {
+		openDialog();
+	});
+
+	addTransactionDialog.addEventListener("click", (event) => {
+		if (event.target === addTransactionDialog) {
+			closeDialog();
+		}
+	});
+</script>

@@ -1,0 +1,41 @@
+---
+import { css } from "css";
+
+interface Props {
+	id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<div
+	id={id}
+	class={css({
+		position: "sticky",
+		bottom: 0,
+		height: "10vh",
+		fontSize: "xl",
+		fontWeight: "bold",
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 2,
+	})}
+>
+	<button
+		class={css({
+			height: "100%",
+			width: "100%",
+			rounded: "md",
+			backgroundColor: "black",
+			color: "white",
+			boxShadow: "xl",
+			_active: {
+				scale: 0.98,
+			},
+		})}
+	>
+		추가
+	</button>
+</div>

@@ -1,0 +1,103 @@
+---
+import { css } from "css";
+import { type TransactionDto } from "lib/client";
+
+interface Props {
+	transactions: TransactionDto[];
+}
+
+const { transactions } = Astro.props;
+---
+
+<div
+	class={css({
+		display: "block",
+		fontSize: "md",
+		textAlign: "center",
+		borderCollapse: "collapse",
+		borderSpacing: 0,
+		width: "100vw",
+		height: "100%",
+	})}
+>
+	<div
+		id="tbody"
+		class={css({
+			"& > *": {
+				display: "grid",
+				gridTemplateColumns: "1fr 1fr 1fr",
+				paddingY: 1,
+				width: "100vw",
+				justifyContent: "space-between",
+				_odd: {
+					backgroundColor: "gray.100",
+				},
+			},
+		})}
+	>
+		{
+			transactions.map((d) => (
+				<a href={`/transactions/${d.id}`} class={css({})}>
+					<span>{d.date}</span>
+					<span>{d.description}</span>
+					<span>{d.amount}</span>
+				</a>
+			))
+		}
+	</div>
+	<div id="loader"></div>
+</div>
+
+<script>
+	import { type TransactionDto } from "lib/client";
+
+	let state =  {
+		startAfter: new Date().toISOString(),
+		hasNext: true,
+	};
+
+	async function fetchTransactions({ startAfter }: { startAfter: string }) {
+		return (await fetch(`/api/transactions/${startAfter}.json`).then((response) =>
+			response.json(),
+		)) as { data: TransactionDto[], startAfter: string, hasNext: boolean };
+	}
+
+	const tbody = document.getElementById("tbody");
+
+	function createTransactionElement(d: TransactionDto) {
+		const a = document.createElement("a");
+
+		a.setAttribute("href", `/transactions/${d.id}`);
+
+		a.innerHTML = `
+			<span>${d.date}</span>
+			<span>${d.description}</span>
+			<span>${d.amount}</span>
+		`;
+
+		return a;
+	}
+
+	const observer = new IntersectionObserver(async (entries) => {
+		if (entries[0]!.isIntersecting) {
+			if (!state.hasNext) {
+				observer.disconnect();
+				return;
+			}
+
+			const { data, startAfter, hasNext } = await fetchTransactions({ startAfter: state.startAfter });
+
+			for (const d of data) {
+				const el = createTransactionElement(d);
+
+				tbody!.appendChild(el);
+			}
+
+			state = { startAfter, hasNext };
+		}
+	});
+
+	const loader = document.getElementById("loader");
+
+	observer.observe(loader!);
+</script>

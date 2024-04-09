@@ -1,0 +1,108 @@
+{
+  "id": "cbba1ab9-4dcf-40e9-9fec-89deeb1dfde8",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "transactions": {
+      "name": "transactions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "category",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "payment_method": {
+          "name": "payment_method",
+          "type": "payment_method",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "category_idx": {
+          "name": "category_idx",
+          "columns": [
+            "category"
+          ],
+          "isUnique": false
+        },
+        "payment_method_idx": {
+          "name": "payment_method_idx",
+          "columns": [
+            "payment_method"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "category": {
+      "name": "category",
+      "values": {
+        "생활비": "생활비",
+        "경조사비": "경조사비",
+        "문화/여행비": "문화/여행비",
+        "저축": "저축",
+        "비자금": "비자금"
+      }
+    },
+    "payment_method": {
+      "name": "payment_method",
+      "values": {
+        "Marlang_Kookmin": "Marlang_Kookmin",
+        "Marlang_Shinhan_Travel": "Marlang_Shinhan_Travel",
+        "Marlang_LG": "Marlang_LG",
+        "Bokchi_Woori_Living": "Bokchi_Woori_Living",
+        "Bokchi_Woori_Spare": "Bokchi_Woori_Spare",
+        "BokChi_Shinhan": "BokChi_Shinhan",
+        "BokChi_Shinhan_Travel": "BokChi_Shinhan_Travel",
+        "Cash": "Cash"
+      }
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
