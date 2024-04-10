@@ -1,0 +1,114 @@
+---
+import "../../index.css";
+import Labels from "components/labels.astro";
+import { css } from "css";
+import type { TransactionDto } from "lib/client";
+
+const { id } = Astro.params;
+
+const transaction = (await fetch(
+	`${Astro.url.origin}/api/transactions/${id}.json`,
+).then((response) => response.json())) as TransactionDto;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>가계부</title>
+	</head>
+	<body>
+		<form
+			data-id={id}
+			id="modify-transaction-form"
+			class={css({
+				height: "100vh",
+				display: "flex",
+				flexDirection: "column",
+				justifyContent: "center",
+			})}
+		>
+			<Labels transaction={transaction} />
+			<div
+				class={css({
+					marginTop: "2rem",
+					display: "flex",
+					justifyContent: "space-between",
+				})}
+			>
+				<button
+					id="delete-transaction-button"
+					class={css({
+						width: "100%",
+						marginX: "0.3rem",
+						backgroundColor: "red.600",
+						color: "white",
+						border: "none",
+						padding: "0.5rem",
+						cursor: "pointer",
+						rounded: "md",
+					})}
+				>
+					삭제
+				</button>
+				<button
+					id="modify-transaction-button"
+					class={css({
+						width: "100%",
+						marginX: "0.3rem",
+						backgroundColor: "teal.600",
+						color: "white",
+						border: "none",
+						padding: "0.5rem",
+						cursor: "pointer",
+						rounded: "md",
+					})}
+				>
+					수정
+				</button>
+			</div>
+		</form>
+	</body>
+</html>
+
+<script>
+	const form = document.getElementById(
+		"modify-transaction-form",
+	) as HTMLFormElement;
+
+	const deleteButton = document.getElementById(
+		"delete-transaction-button",
+	) as HTMLButtonElement;
+
+	deleteButton.addEventListener("click", async (event) => {
+		event.preventDefault();
+
+		await fetch(`/api/transactions/${form.dataset.id}.json`, {
+			method: "DELETE",
+		});
+
+		window.location.href = "/";
+	});
+
+	const modifyButton = document.getElementById(
+		"modify-transaction-button",
+	) as HTMLButtonElement;
+
+	modifyButton.addEventListener("click", async (event) => {
+		event.preventDefault();
+
+		const formData = new FormData(form);
+		const data = Object.fromEntries(formData.entries());
+
+		await fetch(`/api/transactions/${form.dataset.id}.json`, {
+			method: "PATCH",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
+
+		window.location.href = "/";
+	});
+</script>

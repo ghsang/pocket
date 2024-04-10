@@ -1,0 +1,137 @@
+---
+import { css } from "css";
+import { Category, PaymentMethod, type TransactionDto } from "lib/client";
+
+interface Props {
+	transaction?: TransactionDto;
+}
+
+const { transaction } = Astro.props;
+---
+
+<div
+	class={css({
+		display: "flex",
+		flexDirection: "column",
+		paddingX: 4,
+		paddingY: 2,
+		"& > * + *": {
+			marginTop: 2,
+		},
+		"& > *": {
+			minHeight: 0,
+		},
+		"& > label": {
+			display: "grid",
+			gridTemplateColumns: "1fr 2fr",
+		},
+	})}
+>
+	<label
+		class={css({
+			alignItems: "center",
+		})}
+	>
+		<span>내용</span>
+		<input
+			class={css({
+				backgroundColor: "gray.100",
+				rounded: "sm",
+				paddingX: 2,
+				minWidth: 0,
+				height: "2.5rem",
+			})}
+			type="text"
+			name="description"
+			required
+			value={transaction?.description ?? ""}
+		/>
+	</label>
+	<label
+		class={css({
+			alignItems: "center",
+		})}
+	>
+		<span>금액</span>
+		<input
+			class={css({
+				backgroundColor: "gray.100",
+				rounded: "sm",
+				paddingX: 2,
+				height: "2.5rem",
+				minWidth: 0,
+			})}
+			type="number"
+			name="amount"
+			required
+			value={transaction?.amount ?? undefined}
+		/>
+	</label>
+	<label
+		class={css({
+			width: "100%",
+			alignItems: "center",
+		})}
+	>
+		<span>날짜</span>
+		<input
+			class={css({
+				backgroundColor: "gray.100",
+				rounded: "sm",
+				paddingX: 2,
+				height: "2.5rem",
+			})}
+			type="date"
+			name="date"
+			value={transaction?.date ?? new Date().toISOString().split("T")[0]}
+			required
+		/>
+	</label>
+	<label
+		class={css({
+			alignItems: "center",
+		})}
+	>
+		<span>분류</span>
+		<select
+			class={css({
+				backgroundColor: "gray.100",
+				rounded: "sm",
+				paddingX: 2,
+				height: "2.5rem",
+			})}
+			name="category"
+			value={transaction?.category ?? Category.Living}
+		>
+			<option value={Category.Living}>생활비</option>
+			<option value={Category.Tribute}>경조사비</option>
+			<option value={Category.Enjoy}>문화/여행비</option>
+			<option value={Category.Saving}>저축</option>
+			<option value={Category.Excuse}>말랑 비자금</option>
+		</select>
+	</label>
+	<label
+		class={css({
+			alignItems: "center",
+		})}
+	>
+		<span>결제수단</span>
+		<select
+			class={css({
+				backgroundColor: "gray.100",
+				rounded: "sm",
+				paddingX: 2,
+				height: "2.5rem",
+			})}
+			name="paymentMethod"
+			value={transaction?.paymentMethod ?? PaymentMethod.Bokchi_Shinhan}
+		>
+			{
+				Object.entries(PaymentMethod).map(([key, value]) => (
+					<option value={key}>{value}</option>
+				))
+			}
+			>
+		</select>
+	</label>
+</div>

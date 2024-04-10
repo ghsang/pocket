@@ -11,7 +11,7 @@ export const TransactionDaoSchema = z.object({
 
 export const TransactionDtoSchema = z.object({
 	id: z.string().uuid(),
-	date: z.date(),
+	date: z.coerce.date(),
 	category: z.nativeEnum(Category),
 	description: z.string({required_error: '내역을 입력하세요.'}).min(1, '내역을 입력하세요.'),
 	amount: z.coerce.number({required_error: '금액을 입력하세요.'}).min(1, '금액을 입력하세요.'),
@@ -20,4 +20,11 @@ export const TransactionDtoSchema = z.object({
 
 export type TransactionDao = z.infer<typeof TransactionDaoSchema>;
 
-export type TransactionDto = z.infer<typeof TransactionDtoSchema>;
+export type TransactionDto = {
+	id: string;
+	date: string;
+	category: string;
+	description: string;
+	amount: number;
+	paymentMethod: string;
+};

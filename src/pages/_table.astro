@@ -51,15 +51,15 @@ const { transactions } = Astro.props;
 <script>
 	import { type TransactionDto } from "lib/client";
 
-	let state =  {
+	let state = {
 		startAfter: new Date().toISOString(),
 		hasNext: true,
 	};
 
 	async function fetchTransactions({ startAfter }: { startAfter: string }) {
-		return (await fetch(`/api/transactions/${startAfter}.json`).then((response) =>
-			response.json(),
-		)) as { data: TransactionDto[], startAfter: string, hasNext: boolean };
+		return (await fetch(`/api/paged-transactions/${startAfter}.json`).then(
+			(response) => response.json(),
+		)) as { data: TransactionDto[]; startAfter: string; hasNext: boolean };
 	}
 
 	const tbody = document.getElementById("tbody");
@@ -85,7 +85,9 @@ const { transactions } = Astro.props;
 				return;
 			}
 
-			const { data, startAfter, hasNext } = await fetchTransactions({ startAfter: state.startAfter });
+			const { data, startAfter, hasNext } = await fetchTransactions({
+				startAfter: state.startAfter,
+			});
 
 			for (const d of data) {
 				const el = createTransactionElement(d);

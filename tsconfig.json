@@ -6,6 +6,9 @@
       "css": [
         "./styled-system/css"
       ],
+      "components/*": [
+        "./src/components/*"
+      ],
       "lib/client": [
         "./src/lib/client"
       ],
