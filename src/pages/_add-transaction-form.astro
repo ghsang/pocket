@@ -57,13 +57,3 @@ const { id } = Astro.props;
 		</div>
 	</form>
 </dialog>
-
-<script>
-	const form = document.getElementById(
-		"add-transaction-form",
-	) as HTMLFormElement;
-
-	form.addEventListener("click", (event) => {
-		event.stopPropagation();
-	});
-</script>

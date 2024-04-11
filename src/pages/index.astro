@@ -116,13 +116,17 @@ const initialTransactions = await fetchTransactions({ start: "0" });
 	});
 
 	function closeDialog() {
-		addTransactionDialog.close();
-		formOpenButton.style.display = "flex";
+		setTimeout(() => {
+			addTransactionDialog.close();
+			formOpenButton.style.display = "flex";
+		}, 100);
 	}
 
 	function openDialog() {
-		formOpenButton.style.display = "none";
-		addTransactionDialog.showModal();
+		setTimeout(() => {
+			formOpenButton.style.display = "none";
+			addTransactionDialog.showModal();
+		}, 100);
 	}
 
 	formOpenButton.addEventListener("click", () => {

@@ -48,6 +48,9 @@ const transaction = (await fetch(
 						padding: "0.5rem",
 						cursor: "pointer",
 						rounded: "md",
+						_active: {
+							scale: 0.98,
+						},
 					})}
 				>
 					삭제
@@ -63,6 +66,9 @@ const transaction = (await fetch(
 						padding: "0.5rem",
 						cursor: "pointer",
 						rounded: "md",
+						_active: {
+							scale: 0.98,
+						},
 					})}
 				>
 					수정
@@ -109,6 +115,8 @@ const transaction = (await fetch(
 			body: JSON.stringify(data),
 		});
 
-		window.location.href = "/";
+		setTimeout(() => {
+			window.location.href = "/";
+		}, 100);
 	});
 </script>
