@@ -119,4 +119,32 @@ const transaction = (await fetch(
 			window.location.href = "/";
 		}, 100);
 	});
+
+	const body = document.querySelector("body") as HTMLBodyElement;
+
+	let startX = 0; // Starting X position of the touch
+
+	body.addEventListener("touchstart", (e) => {
+		if (e.touches[0] === undefined) return;
+
+		startX = e.touches[0].clientX;
+	});
+
+	body.addEventListener(
+		"touchmove",
+		(e) => {
+			e.preventDefault();
+		},
+		{ passive: false },
+	);
+
+	body.addEventListener("touchend", (e) => {
+		if (e.changedTouches[0] === undefined) return;
+
+		const endX = e.changedTouches[0].clientX;
+
+		if (startX + 50 < endX) {
+			history.back();
+		}
+	});
 </script>
