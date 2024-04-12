@@ -2,17 +2,11 @@
 import Table from "./_table.astro";
 import FormOpenButton from "./_form-open-button.astro";
 import AddTransactionForm from "./_add-transaction-form.astro";
-import { type TransactionDto } from "lib/client";
 import Layout from "./_layout.astro";
 import { css } from "css";
+import { getPagedTransactions } from "lib/server";
 
-async function fetchTransactions({ start }: { start: string }) {
-	return (await fetch(`${Astro.url}/api/paged-transactions/${start}.json`).then(
-		(response) => response.json(),
-	)) as { data: TransactionDto[] };
-}
-
-const initialTransactions = await fetchTransactions({ start: "0" });
+const props = await getPagedTransactions({});
 ---
 
 <Layout>
@@ -21,10 +15,12 @@ const initialTransactions = await fetchTransactions({ start: "0" });
 			height: "90vh",
 		})}
 	>
-		<Table transactions={initialTransactions.data} />
+		<Table transactions={props.data} />
 	</div>
-	<FormOpenButton id="form-open-button" />
-	<AddTransactionForm id="add-transaction" />
+	<form-handler>
+		<FormOpenButton />
+		<AddTransactionForm />
+	</form-handler>
 </Layout>
 
 <style>
@@ -36,106 +32,112 @@ const initialTransactions = await fetchTransactions({ start: "0" });
 </style>
 
 <script>
-	const formOpenButton = document.getElementById(
-		"form-open-button",
-	) as HTMLButtonElement;
+	import type { TransactionDao } from "lib/client";
 
-	const addTransactionDialog = document.getElementById(
-		"add-transaction",
-	) as HTMLDialogElement;
+	class FormHandler extends HTMLElement {
+		constructor() {
+			super();
 
-	const addTransactionForm = document.querySelector(
-		"#add-transaction > form",
-	) as HTMLFormElement;
+			const formOpenDiv = this.querySelector("div") as HTMLDivElement;
 
-	function getDateFromAnchorElement(a: HTMLAnchorElement) {
-		const span = a.querySelector("span") as HTMLSpanElement;
-		return new Date(span.textContent!);
-	}
+			const formOpenButton = this.querySelector(
+				"div > button",
+			) as HTMLButtonElement;
 
-	function createAnchor(data: any) {
-		const a = document.createElement("a");
+			const dialog = this.querySelector("dialog") as HTMLDialogElement;
 
-		a.setAttribute("href", `/transactions/${data.id}`);
+			const form = this.querySelector("form") as HTMLFormElement;
 
-		a.innerHTML = `
-			<span>${data.date}</span>
-			<span>${data.description}</span>
-			<span>${data.amount}</span>
-		`;
+			function createAnchor(data: any) {
+				const a = document.createElement("a");
 
-		a.style.animation = "tempBgColorChange 0.8s ease-in-out forwards";
+				a.setAttribute("href", `/transactions/${data.id}`);
 
-		return a;
-	}
+				a.innerHTML = `
+					<span>${data.date}</span>
+					<span>${data.description}</span>
+					<span>${data.amount}</span>
+				`;
 
-	addTransactionForm.addEventListener("submit", async (event) => {
-		event.preventDefault();
+				a.style.animation = "tempBgColorChange 0.8s ease-in-out forwards";
 
-		const formData = new FormData(addTransactionForm);
-		const data = Object.fromEntries(formData.entries());
-		const tbody = document.getElementById("tbody") as HTMLDivElement;
-		const allRows = tbody.getElementsByTagName("a");
-
-		await fetch("/api/transactions.json", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(data),
-		}).then((response) => response.json());
-
-		const a = createAnchor(data);
-
-		let inserted = false;
-
-		for (const r of allRows) {
-			const date = getDateFromAnchorElement(r);
-
-			if (new Date(data.date as string) >= date) {
-				tbody.insertBefore(a, r);
-
-				a.scrollIntoView({
-					block: "center",
-					behavior: "instant",
-				});
-
-				closeDialog();
-
-				inserted = true;
-
-				return;
+				return a;
 			}
+
+			function getDateFromAnchorElement(a: HTMLAnchorElement) {
+				const span = a.querySelector("span") as HTMLSpanElement;
+				return new Date(span.textContent!);
+			}
+
+			function closeDialog() {
+				setTimeout(() => {
+					dialog.close();
+					formOpenDiv.style.display = "flex";
+				}, 100);
+			}
+
+			formOpenButton.addEventListener("click", () => {
+				setTimeout(() => {
+					formOpenDiv.style.display = "none";
+					dialog.showModal();
+				}, 100);
+			});
+
+			form.addEventListener("submit", async (event) => {
+				event.preventDefault();
+
+				const formData = new FormData(form);
+				const tmp = Object.fromEntries(formData.entries());
+				const data = { ...tmp, amount: Number(tmp.amount) } as TransactionDao;
+
+				const tbody = document.getElementById("tbody") as HTMLDivElement;
+				const allRows = tbody.getElementsByTagName("a");
+
+				const { id } = await fetch("/api/transactions.json", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				}).then((response) => response.json());
+
+				const a = createAnchor({ id, ...data });
+
+				let inserted = false;
+
+				for (const r of allRows) {
+					const date = getDateFromAnchorElement(r);
+
+					if (new Date(data.date) >= date) {
+						tbody.insertBefore(a, r);
+
+						a.scrollIntoView({
+							block: "center",
+							behavior: "instant",
+						});
+
+						closeDialog();
+
+						inserted = true;
+
+						return;
+					}
+				}
+
+				if (!inserted) {
+					tbody.appendChild(a);
+
+					closeDialog();
+
+					return;
+				}
+			});
+
+			dialog.addEventListener("click", (event) => {
+				if (event.target === dialog) {
+					closeDialog();
+				}
+			});
 		}
-
-		if (!inserted) {
-			tbody.appendChild(a);
-
-			closeDialog();
-
-			return;
-		}
-	});
-
-	function closeDialog() {
-		setTimeout(() => {
-			addTransactionDialog.close();
-			formOpenButton.style.display = "flex";
-		}, 100);
 	}
 
-	function openDialog() {
-		setTimeout(() => {
-			formOpenButton.style.display = "none";
-			addTransactionDialog.showModal();
-		}, 100);
-	}
-
-	formOpenButton.addEventListener("click", () => {
-		openDialog();
-	});
-
-	addTransactionDialog.addEventListener("click", (event) => {
-		if (event.target === addTransactionDialog) {
-			closeDialog();
-		}
-	});
+	customElements.define("form-handler", FormHandler);
 </script>

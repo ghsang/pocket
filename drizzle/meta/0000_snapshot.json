@@ -1,9 +1,32 @@
 {
-  "id": "cbba1ab9-4dcf-40e9-9fec-89deeb1dfde8",
+  "id": "36c77e9a-2920-4144-8af6-c7927a96b649",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
+    "budgets": {
+      "name": "budgets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "char(6)",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "'unique'"
+        },
+        "value": {
+          "name": "value",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "transactions": {
       "name": "transactions",
       "schema": "",
@@ -19,31 +42,31 @@
           "name": "date",
           "type": "date",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "category": {
           "name": "category",
           "type": "category",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "description": {
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "amount": {
           "name": "amount",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "payment_method": {
           "name": "payment_method",
           "type": "payment_method",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -88,14 +111,14 @@
     "payment_method": {
       "name": "payment_method",
       "values": {
-        "Marlang_Kookmin": "Marlang_Kookmin",
-        "Marlang_Shinhan_Travel": "Marlang_Shinhan_Travel",
-        "Marlang_LG": "Marlang_LG",
-        "Bokchi_Woori_Living": "Bokchi_Woori_Living",
-        "Bokchi_Woori_Spare": "Bokchi_Woori_Spare",
-        "BokChi_Shinhan": "BokChi_Shinhan",
-        "BokChi_Shinhan_Travel": "BokChi_Shinhan_Travel",
-        "Cash": "Cash"
+        "말랑 국민": "말랑 국민",
+        "말랑 신한 트레블": "말랑 신한 트레블",
+        "말랑 LG": "말랑 LG",
+        "복치 우리 생활비": "복치 우리 생활비",
+        "복치 우리 예비": "복치 우리 예비",
+        "복치 신한": "복치 신한",
+        "복치 신한 트레블": "복치 신한 트레블",
+        "현금": "현금"
       }
     }
   },

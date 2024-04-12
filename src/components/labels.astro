@@ -1,6 +1,6 @@
 ---
 import { css } from "css";
-import { Category, PaymentMethod, type TransactionDto } from "lib/client";
+import { categories, paymentMethods, type TransactionDto } from "lib/client";
 
 interface Props {
 	transaction?: TransactionDto;
@@ -101,13 +101,9 @@ const { transaction } = Astro.props;
 				height: "2.5rem",
 			})}
 			name="category"
-			value={transaction?.category ?? Category.Living}
+			value={transaction?.category ?? "생활비"}
 		>
-			<option value={Category.Living}>생활비</option>
-			<option value={Category.Tribute}>경조사비</option>
-			<option value={Category.Enjoy}>문화/여행비</option>
-			<option value={Category.Saving}>저축</option>
-			<option value={Category.Excuse}>말랑 비자금</option>
+			{categories.map((i) => <option value={i}>{i}</option>)}
 		</select>
 	</label>
 	<label
@@ -124,14 +120,9 @@ const { transaction } = Astro.props;
 				height: "2.5rem",
 			})}
 			name="paymentMethod"
-			value={transaction?.paymentMethod ?? PaymentMethod.Bokchi_Shinhan}
+			value={transaction?.paymentMethod ?? "현금"}
 		>
-			{
-				Object.entries(PaymentMethod).map(([key, value]) => (
-					<option value={key}>{value}</option>
-				))
-			}
-			>
+			{paymentMethods.map((i) => <option value={i}>{i}</option>)}
 		</select>
 	</label>
 </div>

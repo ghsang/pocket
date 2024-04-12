@@ -54,6 +54,7 @@ const { transactions } = Astro.props;
 	let state = {
 		startAfter: new Date().toISOString(),
 		hasNext: true,
+		initial: true,
 	};
 
 	async function fetchTransactions({ startAfter }: { startAfter: string }) {
@@ -85,6 +86,11 @@ const { transactions } = Astro.props;
 				return;
 			}
 
+			if (state.initial) {
+				state.initial = false;
+				return;
+			}
+
 			const { data, startAfter, hasNext } = await fetchTransactions({
 				startAfter: state.startAfter,
 			});
@@ -95,7 +101,7 @@ const { transactions } = Astro.props;
 				tbody!.appendChild(el);
 			}
 
-			state = { startAfter, hasNext };
+			state = { startAfter, hasNext, initial: false };
 		}
 	});
 

@@ -1,45 +1,58 @@
 ---
 import "../index.css";
-import {css} from "css";
+import { css } from "css";
+import { ViewTransitions } from "astro:transitions";
 
 const active = (href: string) => Astro.url.pathname === href;
 
 const navigation = [
-  {href: "/", label: "일지"},
-  {href: "/budget", label: "예산"},
-  {href: "/payment-methods", label: "결제수단"},
+  { href: "/", label: "일지" },
+  { href: "/budget", label: "예산" },
+  { href: "/payment-methods", label: "결제수단" },
 ];
 ---
+
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="generator" content={Astro.generator} />
-		<title>가계부</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>가계부</title>
+    <ViewTransitions />
   </head>
-  <header class={css({
-      height: "10vh",
-  })}>
-    <nav class={css({
-      display: "flex",
-      justifyContent: "space-around",
-      alignItems: "center",
-      height: "100%",
-      fontSize: "xl",
-    })}>
-    {navigation.map(({href, label}) => (
-      <a 
-        href={href}
-        class={css({
-          borderColor: active(href) ? "teal.500" : "",
-          borderBottomWidth: active(href) ? "4px" : "0",
-          marginTop: active(href) ? "2px" : "0",
-        })}
-      >{label}</a>
-    ))}
-    </nav>
-  </header>
   <body>
-    <slot /> <!-- your content is injected here -->
+    <header
+      class={css({
+        height: "10vh",
+      })}
+    >
+      <nav
+        class={css({
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+          height: "100%",
+          fontSize: "xl",
+        })}
+      >
+        {
+          navigation.map(({ href, label }) => (
+            <a
+              href={href}
+              class={css({
+                borderColor: active(href) ? "teal.500" : "",
+                borderBottomWidth: active(href) ? "4px" : "0",
+                marginTop: active(href) ? "2px" : "0",
+              })}
+            >
+              {label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+    <main transition:animate="slide">
+      <slot />
+    </main>
   </body>
 </html>

@@ -19,132 +19,147 @@ const transaction = (await fetch(
 		<title>가계부</title>
 	</head>
 	<body>
-		<form
-			data-id={id}
-			id="modify-transaction-form"
-			class={css({
-				height: "100vh",
-				display: "flex",
-				flexDirection: "column",
-				justifyContent: "center",
-			})}
-		>
-			<Labels transaction={transaction} />
-			<div
+		<detail-form-handler>
+			<form
+				data-id={id}
 				class={css({
-					marginTop: "2rem",
+					height: "100vh",
 					display: "flex",
-					justifyContent: "space-between",
+					flexDirection: "column",
+					justifyContent: "center",
 				})}
 			>
-				<button
-					id="delete-transaction-button"
+				<Labels transaction={transaction} />
+				<div
 					class={css({
-						width: "100%",
-						marginX: "0.3rem",
-						backgroundColor: "red.600",
-						color: "white",
-						border: "none",
-						padding: "0.5rem",
-						cursor: "pointer",
-						rounded: "md",
-						_active: {
-							scale: 0.98,
-						},
+						marginTop: "2rem",
+						display: "flex",
+						justifyContent: "space-between",
 					})}
 				>
-					삭제
-				</button>
-				<button
-					id="modify-transaction-button"
-					class={css({
-						width: "100%",
-						marginX: "0.3rem",
-						backgroundColor: "teal.600",
-						color: "white",
-						border: "none",
-						padding: "0.5rem",
-						cursor: "pointer",
-						rounded: "md",
-						_active: {
-							scale: 0.98,
-						},
-					})}
-				>
-					수정
-				</button>
-			</div>
-		</form>
+					<button
+						id="delete-transaction-button"
+						class={"delete-button " +
+							css({
+								width: "100%",
+								marginX: "0.3rem",
+								backgroundColor: "red.600",
+								color: "white",
+								border: "none",
+								padding: "0.5rem",
+								cursor: "pointer",
+								rounded: "md",
+								_active: {
+									scale: 0.98,
+								},
+							})}
+					>
+						삭제
+					</button>
+					<button
+						class={"modify-button " +
+							css({
+								width: "100%",
+								marginX: "0.3rem",
+								backgroundColor: "teal.600",
+								color: "white",
+								border: "none",
+								padding: "0.5rem",
+								cursor: "pointer",
+								rounded: "md",
+								_active: {
+									scale: 0.98,
+								},
+							})}
+					>
+						수정
+					</button>
+				</div>
+			</form>
+		</detail-form-handler>
 	</body>
 </html>
 
 <script>
-	const form = document.getElementById(
-		"modify-transaction-form",
-	) as HTMLFormElement;
+	import { navigate } from "astro:transitions/client";
 
-	const deleteButton = document.getElementById(
-		"delete-transaction-button",
-	) as HTMLButtonElement;
+	class DetailFormHandler extends HTMLElement {
+		constructor() {
+			super();
 
-	deleteButton.addEventListener("click", async (event) => {
-		event.preventDefault();
+			const form = this.querySelector("form") as HTMLFormElement;
 
-		await fetch(`/api/transactions/${form.dataset.id}.json`, {
-			method: "DELETE",
-		});
+			const deleteButton = this.querySelector(
+				".delete-button",
+			) as HTMLButtonElement;
 
-		window.location.href = "/";
-	});
+			const modifyButton = this.querySelector(
+				".modify-button",
+			) as HTMLButtonElement;
 
-	const modifyButton = document.getElementById(
-		"modify-transaction-button",
-	) as HTMLButtonElement;
+			function getFormData() {
+				const formData = new FormData(form);
+				const tmp = Object.fromEntries(formData.entries());
+				return { ...tmp, amount: Number(tmp.amount) };
+			}
 
-	modifyButton.addEventListener("click", async (event) => {
-		event.preventDefault();
+			deleteButton.addEventListener("click", async (event) => {
+				event.preventDefault();
 
-		const formData = new FormData(form);
-		const data = Object.fromEntries(formData.entries());
+				await fetch(`/api/transactions/${form.dataset.id}.json`, {
+					method: "DELETE",
+				});
 
-		await fetch(`/api/transactions/${form.dataset.id}.json`, {
-			method: "PATCH",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(data),
-		});
+				navigate("/");
+			});
 
-		setTimeout(() => {
-			window.location.href = "/";
-		}, 100);
-	});
+			modifyButton.addEventListener("click", async (event) => {
+				event.preventDefault();
 
-	const body = document.querySelector("body") as HTMLBodyElement;
+				const data = getFormData();
 
-	let startX = 0; // Starting X position of the touch
+				await fetch(`/api/transactions/${form.dataset.id}.json`, {
+					method: "PATCH",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				});
 
-	body.addEventListener("touchstart", (e) => {
-		if (e.touches[0] === undefined) return;
+				setTimeout(() => {
+					navigate("/");
+				}, 100);
+			});
 
-		startX = e.touches[0].clientX;
-	});
+			const body = document.querySelector("body") as HTMLBodyElement;
 
-	body.addEventListener(
-		"touchmove",
-		(e) => {
-			e.preventDefault();
-		},
-		{ passive: false },
-	);
+			let startX = 0;
 
-	body.addEventListener("touchend", (e) => {
-		if (e.changedTouches[0] === undefined) return;
+			body.addEventListener("touchstart", (e) => {
+				if (e.touches[0] === undefined) return;
 
-		const endX = e.changedTouches[0].clientX;
+				startX = e.touches[0].clientX;
+			});
 
-		if (startX + 50 < endX) {
-			history.back();
+			body.addEventListener(
+				"touchmove",
+				(e) => {
+					e.preventDefault();
+				},
+				{ passive: false },
+			);
+
+			body.addEventListener("touchend", (e) => {
+				if (e.changedTouches[0] === undefined) return;
+
+				const endX = e.changedTouches[0].clientX;
+
+				if (startX + 50 < endX) {
+					history.back();
+				}
+			});
 		}
-	});
+	}
+
+	customElements.define("detail-form-handler", DetailFormHandler);
 </script>

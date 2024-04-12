@@ -1,5 +1,60 @@
 ---
+import { getPaymentMethodInfo } from "lib/server";
 import Layout from "../_layout.astro";
+import { css } from "css";
+
+const paymentMethodinfo = await getPaymentMethodInfo();
 ---
 
-<Layout></Layout>
+<Layout>
+	<div
+		class={css({
+			height: "80vh",
+			display: "flex",
+			alignItems: "center",
+		})}
+	>
+		<table
+			class={css({
+				width: "100%",
+			})}
+		>
+			<thead
+				class={css({
+					backgroundColor: "lime.100",
+				})}
+			>
+				<tr>
+					<th class={css({ paddingY: "1rem", paddingLeft: "1rem" })}
+						>결제수단</th
+					>
+					<th class={css({ paddingRight: "1rem" })}>사용</th>
+				</tr>
+			</thead>
+			<tbody
+				class={css({
+					textAlign: "right",
+					"& > * + *": {
+						borderTop: "1px solid",
+						borderColor: "gray.300",
+					},
+				})}
+			>
+				{
+					paymentMethodinfo !== undefined
+						? paymentMethodinfo.map((i) => (
+								<tr>
+									<td class={css({ textAlign: "center", paddingLeft: "1rem", paddingY: "1rem" })}>
+										{i.paymentMethod}
+									</td>
+									<td class={css({ paddingRight: "1rem" })}>
+										{i.amount!.toLocaleString()}
+									</td>
+								</tr>
+							))
+						: null
+				}
+			</tbody>
+		</table>
+	</div>
+</Layout>

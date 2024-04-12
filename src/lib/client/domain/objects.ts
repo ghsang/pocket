@@ -1,24 +1,26 @@
-import z from 'zod';
-import {Category, PaymentMethod} from './values';
+import * as v from 'valibot';
+import {
+	categories, paymentMethods,
+} from './values';
 
-export const TransactionDaoSchema = z.object({
-	date: z.date(),
-	category: z.nativeEnum(Category),
-	description: z.string({required_error: '내역을 입력하세요.'}).min(1, '내역을 입력하세요.'),
-	amount: z.coerce.number({required_error: '금액을 입력하세요.'}).min(1, '금액을 입력하세요.'),
-	paymentMethod: z.nativeEnum(PaymentMethod),
+export const TransactionDaoSchema = v.object({
+	date: v.date(),
+	category: v.picklist(categories),
+	description: v.string([v.minLength(1)]),
+	amount: v.number(),
+	paymentMethod: v.picklist(paymentMethods),
 });
 
-export const TransactionDtoSchema = z.object({
-	id: z.string().uuid(),
-	date: z.coerce.date(),
-	category: z.nativeEnum(Category),
-	description: z.string({required_error: '내역을 입력하세요.'}).min(1, '내역을 입력하세요.'),
-	amount: z.coerce.number({required_error: '금액을 입력하세요.'}).min(1, '금액을 입력하세요.'),
-	paymentMethod: z.nativeEnum(PaymentMethod),
+export const TransactionDtoSchema = v.object({
+	id: v.string([v.uuid()]),
+	date: v.date(),
+	category: v.picklist(categories),
+	description: v.string([v.minLength(1)]),
+	amount: v.number(),
+	paymentMethod: v.picklist(paymentMethods),
 });
 
-export type TransactionDao = z.infer<typeof TransactionDaoSchema>;
+export type TransactionDao = v.Input<typeof TransactionDaoSchema>;
 
 export type TransactionDto = {
 	id: string;
