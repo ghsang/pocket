@@ -12,7 +12,7 @@ export async function getPagedTransactions({startAfter = new Date(), limit = 50}
 		.select()
 		.from(transactions)
 		.where(startAfter ? lt(transactions.createdAt, startAfter) : undefined)
-		.orderBy(desc(transactions.createdAt))
+		.orderBy(desc(transactions.date), desc(transactions.createdAt))
 		.limit(limit);
 
 	return {
