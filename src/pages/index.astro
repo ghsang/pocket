@@ -15,7 +15,7 @@ const props = await getPagedTransactions({});
 			height: "90vh",
 		})}
 	>
-		<Table transactions={props.data} />
+		<Table transactions={props.data} hasNext={props.hasNext} />
 	</div>
 	<form-handler>
 		<FormOpenButton />
@@ -90,8 +90,8 @@ const props = await getPagedTransactions({});
 				const tmp = Object.fromEntries(formData.entries());
 				const data = { ...tmp, amount: Number(tmp.amount) } as TransactionDao;
 
-				const tbody = document.getElementById("tbody") as HTMLDivElement;
-				const allRows = tbody.getElementsByTagName("a");
+				const table = this.querySelector(".table") as HTMLDivElement;
+				const allRows = table.getElementsByTagName("a");
 
 				const { id } = await fetch("/api/transactions.json", {
 					method: "POST",
@@ -107,7 +107,7 @@ const props = await getPagedTransactions({});
 					const date = getDateFromAnchorElement(r);
 
 					if (new Date(data.date) >= date) {
-						tbody.insertBefore(a, r);
+						table.insertBefore(a, r);
 
 						a.scrollIntoView({
 							block: "center",
@@ -123,7 +123,7 @@ const props = await getPagedTransactions({});
 				}
 
 				if (!inserted) {
-					tbody.appendChild(a);
+					table.appendChild(a);
 
 					closeDialog();
 

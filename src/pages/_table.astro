@@ -4,108 +4,120 @@ import { type TransactionDto } from "lib/client";
 
 interface Props {
 	transactions: TransactionDto[];
+	hasNext: boolean;
 }
 
-const { transactions } = Astro.props;
+const { transactions, hasNext } = Astro.props;
 ---
 
-<div
-	class={css({
-		display: "block",
-		fontSize: "md",
-		textAlign: "center",
-		borderCollapse: "collapse",
-		borderSpacing: 0,
-		width: "100vw",
-		height: "100%",
-	})}
->
+<fetch-more data-hasnext={hasNext}>
 	<div
-		id="tbody"
 		class={css({
-			"& > *": {
-				display: "grid",
-				gridTemplateColumns: "1fr 1fr 1fr",
-				paddingY: 1,
-				width: "100vw",
-				justifyContent: "space-between",
-				_odd: {
-					backgroundColor: "gray.100",
-				},
-			},
+			display: "block",
+			fontSize: "md",
+			textAlign: "center",
+			borderCollapse: "collapse",
+			borderSpacing: 0,
+			width: "100vw",
+			height: "100%",
+			overflowY: "auto",
 		})}
 	>
-		{
-			transactions.map((d) => (
-				<a href={`/transactions/${d.id}`} class={css({})}>
-					<span>{d.date}</span>
-					<span>{d.description}</span>
-					<span>{d.amount}</span>
-				</a>
-			))
-		}
+		<div
+			class={"table " +
+				css({
+					"& > *": {
+						display: "grid",
+						gridTemplateColumns: "1fr 1fr 1fr",
+						paddingY: "1rem",
+						width: "100vw",
+						justifyContent: "space-between",
+						_odd: {
+							backgroundColor: "gray.100",
+						},
+					},
+				})}
+		>
+			{
+				transactions.map((d) => (
+					<a href={`/transactions/${d.id}`} class={css({})}>
+						<span>{d.date}</span>
+						<span>{d.description}</span>
+						<span>{d.amount}</span>
+					</a>
+				))
+			}
+		</div>
+		<div class="loader"></div>
 	</div>
-	<div id="loader"></div>
-</div>
+</fetch-more>
 
 <script>
 	import { type TransactionDto } from "lib/client";
 
-	let state = {
-		startAfter: new Date().toISOString(),
-		hasNext: true,
-		initial: true,
-	};
+	class FetchMore extends HTMLElement {
+		constructor() {
+			super();
 
-	async function fetchTransactions({ startAfter }: { startAfter: string }) {
-		return (await fetch(`/api/paged-transactions/${startAfter}.json`).then(
-			(response) => response.json(),
-		)) as { data: TransactionDto[]; startAfter: string; hasNext: boolean };
-	}
-
-	const tbody = document.getElementById("tbody");
-
-	function createTransactionElement(d: TransactionDto) {
-		const a = document.createElement("a");
-
-		a.setAttribute("href", `/transactions/${d.id}`);
-
-		a.innerHTML = `
-			<span>${d.date}</span>
-			<span>${d.description}</span>
-			<span>${d.amount}</span>
-		`;
-
-		return a;
-	}
-
-	const observer = new IntersectionObserver(async (entries) => {
-		if (entries[0]!.isIntersecting) {
-			if (!state.hasNext) {
-				observer.disconnect();
-				return;
+			async function fetchTransactions({ startAfter }: { startAfter: string }) {
+				return (await fetch(`/api/paged-transactions/${startAfter}.json`).then(
+					(response) => response.json(),
+				)) as { data: TransactionDto[]; startAfter: string; hasNext: boolean };
 			}
 
-			if (state.initial) {
-				state.initial = false;
-				return;
+			let state = {
+				startAfter: new Date().toISOString(),
+				hasNext: Boolean(this.dataset.hasNext),
+				initial: true,
+			};
+
+			const table = this.querySelector(".table");
+
+			function createTransactionElement(d: TransactionDto) {
+				const a = document.createElement("a");
+
+				a.setAttribute("href", `/transactions/${d.id}`);
+
+				a.innerHTML = `
+					<span>${d.date}</span>
+					<span>${d.description}</span>
+					<span>${d.amount}</span>
+				`;
+
+				return a;
 			}
 
-			const { data, startAfter, hasNext } = await fetchTransactions({
-				startAfter: state.startAfter,
+			const observer = new IntersectionObserver(async (entries) => {
+				if (entries[0]!.isIntersecting) {
+					if (!state.hasNext) {
+						observer.disconnect();
+						return;
+					}
+
+					if (state.initial) {
+						state.initial = false;
+						return;
+					}
+
+					const { data, startAfter, hasNext } = await fetchTransactions({
+						startAfter: state.startAfter,
+					});
+
+					for (const d of data) {
+						const el = createTransactionElement(d);
+
+						table!.appendChild(el);
+					}
+
+					state = { startAfter, hasNext, initial: false };
+				}
 			});
 
-			for (const d of data) {
-				const el = createTransactionElement(d);
+			const loader = this.querySelector(".loader");
 
-				tbody!.appendChild(el);
-			}
-
-			state = { startAfter, hasNext, initial: false };
+			observer.observe(loader!);
 		}
-	});
+	}
 
-	const loader = document.getElementById("loader");
-
-	observer.observe(loader!);
+	customElements.define("fetch-more", FetchMore);
 </script>
