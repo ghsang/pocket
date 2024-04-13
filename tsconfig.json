@@ -18,6 +18,10 @@
       "lib/share": [
         "./src/lib/share"
       ]
-    },
+    }
   },
+  "include": [
+    "vite-plugin-pwa/vanillajs",
+    "vite-plugin-pwa/info"
+  ]
 }

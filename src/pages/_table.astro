@@ -11,44 +11,46 @@ const { transactions, hasNext } = Astro.props;
 ---
 
 <fetch-more data-hasnext={hasNext}>
-	<div
-		class={css({
-			display: "block",
-			fontSize: "md",
-			textAlign: "center",
-			borderCollapse: "collapse",
-			borderSpacing: 0,
-			width: "100vw",
-			height: "100%",
-			overflowY: "auto",
-		})}
-	>
+	<div class={css({ height: "90vh" })}>
 		<div
-			class={"table " +
-				css({
-					"& > *": {
-						display: "grid",
-						gridTemplateColumns: "1fr 1fr 1fr",
-						paddingY: "1rem",
-						width: "100vw",
-						justifyContent: "space-between",
-						_odd: {
-							backgroundColor: "gray.100",
-						},
-					},
-				})}
+			class={css({
+				display: "block",
+				fontSize: "md",
+				textAlign: "center",
+				borderCollapse: "collapse",
+				borderSpacing: 0,
+				width: "100vw",
+				height: "100%",
+				overflowY: "auto",
+			})}
 		>
-			{
-				transactions.map((d) => (
-					<a href={`/transactions/${d.id}`} class={css({})}>
-						<span>{d.date}</span>
-						<span>{d.description}</span>
-						<span>{d.amount}</span>
-					</a>
-				))
-			}
+			<div
+				class={"table " +
+					css({
+						"& > *": {
+							display: "grid",
+							gridTemplateColumns: "1fr 1fr 1fr",
+							paddingY: "1rem",
+							width: "100vw",
+							justifyContent: "space-between",
+							_odd: {
+								backgroundColor: "gray.100",
+							},
+						},
+					})}
+			>
+				{
+					transactions.map((d) => (
+						<a href={`/transactions/${d.id}`} class={css({})}>
+							<span>{d.date}</span>
+							<span>{d.description}</span>
+							<span>{d.amount}</span>
+						</a>
+					))
+				}
+			</div>
+			<div class="loader"></div>
 		</div>
-		<div class="loader"></div>
 	</div>
 </fetch-more>
 

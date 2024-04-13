@@ -3,31 +3,36 @@ import { css } from "css";
 ---
 
 <div
-	class={css({
-		position: "sticky",
-		bottom: 0,
-		height: "10vh",
-		fontSize: "xl",
-		fontWeight: "bold",
-		display: "flex",
-		flexDirection: "column",
-		justifyContent: "center",
-		alignItems: "center",
-		padding: 2,
-	})}
+	class={"form-open " +
+		css({
+			position: "sticky",
+			bottom: 0,
+			bgTransparency: 1.0,
+			height: "5rem",
+			fontSize: "xl",
+			fontWeight: "bold",
+			display: "flex",
+			flexDirection: "column",
+			justifyContent: "center",
+			alignItems: "center",
+			paddingX: 2,
+			paddingTop: 2,
+			paddingBottom: 4,
+		})}
 >
 	<button
-		class={css({
-			height: "100%",
-			width: "100%",
-			rounded: "md",
-			backgroundColor: "black",
-			color: "white",
-			boxShadow: "xl",
-			_active: {
-				scale: 0.98,
-			},
-		})}
+		class={"form-open " +
+			css({
+				height: "100%",
+				width: "100%",
+				rounded: "md",
+				backgroundColor: "black",
+				color: "white",
+				boxShadow: "xl",
+				_active: {
+					scale: 0.98,
+				},
+			})}
 	>
 		추가
 	</button>
