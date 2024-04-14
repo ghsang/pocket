@@ -34,6 +34,7 @@
     "prettier-plugin-astro": "^0.13.0",
     "typescript": "^5.4.2",
     "vite-plugin-pwa": "^0.19.4",
+    "workbox-window": "^7.0.0",
     "xo": "^0.58.0"
   },
   "xo": {
