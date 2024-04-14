@@ -48,7 +48,7 @@ const paymentMethodinfo = await getPaymentMethodInfo();
 										{i.paymentMethod}
 									</td>
 									<td class={css({ paddingRight: "1rem" })}>
-										{i.amount!.toLocaleString()}
+										{Number(i.amount!).toLocaleString()}
 									</td>
 								</tr>
 							))

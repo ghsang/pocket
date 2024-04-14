@@ -58,7 +58,7 @@ const { transactions, hasNext } = Astro.props;
 </fetch-more>
 
 <script>
-	import { type TransactionDto, converDate } from "lib/client";
+	import { type TransactionDto, convertDate } from "lib/client";
 
 	class FetchMore extends HTMLElement {
 		constructor() {
