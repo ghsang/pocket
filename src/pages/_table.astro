@@ -1,6 +1,6 @@
 ---
 import { css } from "css";
-import { type TransactionDto } from "lib/client";
+import { type TransactionDto, convertDate } from "lib/client";
 
 interface Props {
 	transactions: TransactionDto[];
@@ -29,7 +29,7 @@ const { transactions, hasNext } = Astro.props;
 					css({
 						"& > *": {
 							display: "grid",
-							gridTemplateColumns: "1fr 1fr 1fr",
+							gridTemplateColumns: "1fr 4fr 2fr",
 							paddingY: "1rem",
 							width: "100vw",
 							justifyContent: "space-between",
@@ -41,10 +41,13 @@ const { transactions, hasNext } = Astro.props;
 			>
 				{
 					transactions.map((d) => (
-						<a href={`/transactions/${d.id}`} class={css({})}>
-							<span>{d.date}</span>
+						<a 
+							href={`/transactions/${d.id}`} 
+							class={css({paddingX: 2})}
+						>
+							<span>{convertDate(d.date)}</span>
 							<span>{d.description}</span>
-							<span>{d.amount}</span>
+							<span>{d.amount.toLocaleString()}</span>
 						</a>
 					))
 				}
@@ -55,7 +58,7 @@ const { transactions, hasNext } = Astro.props;
 </fetch-more>
 
 <script>
-	import { type TransactionDto } from "lib/client";
+	import { type TransactionDto, converDate } from "lib/client";
 
 	class FetchMore extends HTMLElement {
 		constructor() {
@@ -81,9 +84,9 @@ const { transactions, hasNext } = Astro.props;
 				a.setAttribute("href", `/transactions/${d.id}`);
 
 				a.innerHTML = `
-					<span>${d.date}</span>
+					<span>${convertDate(d.date)}</span>
 					<span>${d.description}</span>
-					<span>${d.amount}</span>
+					<span>${d.amount.toLocaleString()}</span>
 				`;
 
 				return a;
