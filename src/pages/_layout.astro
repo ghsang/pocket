@@ -56,7 +56,61 @@ const navigation = [
       </nav>
     </header>
     <main transition:animate="slide">
+      <swipe-navigation />
       <slot />
     </main>
   </body>
 </html>
+
+<script>
+	import { navigate } from "astro:transitions/client";
+
+  class SwipeNavigation extends HTMLElement {
+    constructor() {
+      super();
+
+      const hrefs = ['/', '/budget', '/payment-methods'];
+
+      function swipeRight() {
+        if (window.location.pathname === hrefs[0]) return;
+
+        const index = hrefs.indexOf(window.location.pathname);
+
+        navigate(hrefs[index - 1]);
+      }
+
+      function swipeLeft() {
+        if (window.location.pathname === hrefs[hrefs.length - 1]) return;
+
+        const index = hrefs.indexOf(window.location.pathname);
+
+
+        navigate(hrefs[index + 1]);
+      }
+
+			const body = document.querySelector("body") as HTMLBodyElement;
+
+			let startX = 0;
+
+			body.addEventListener("touchstart", (e) => {
+				if (e.touches[0] === undefined) return;
+
+				startX = e.touches[0].clientX;
+			});
+
+			body.addEventListener("touchend", (e) => {
+				if (e.changedTouches[0] === undefined) return;
+
+				const endX = e.changedTouches[0].clientX;
+
+				if (startX + 50 < endX) {
+          swipeRight();
+				} else if (startX - 50 > endX) {
+          swipeLeft();
+        }
+			});
+    }
+  }
+
+  customElements.define("swipe-navigation", SwipeNavigation);
+</script>
