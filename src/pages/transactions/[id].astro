@@ -3,6 +3,13 @@ import "../../index.css";
 import Labels from "components/labels.astro";
 import { css } from "css";
 import type { TransactionDto } from "lib/client";
+import { getSession } from "auth-astro/server";
+
+const session = await getSession(Astro.request);
+
+if (!session || !session.user?.name) {
+	return Astro.redirect("/login");
+}
 
 const { id } = Astro.params;
 
@@ -29,7 +36,7 @@ const transaction = (await fetch(
 					justifyContent: "center",
 				})}
 			>
-				<Labels transaction={transaction} />
+				<Labels transaction={transaction} user={session.user.name} />
 				<div
 					class={css({
 						marginTop: "2rem",

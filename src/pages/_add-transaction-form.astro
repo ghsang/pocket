@@ -2,11 +2,10 @@
 import { css } from "css";
 import Labels from "components/labels.astro";
 
-const { id } = Astro.props;
+const { user } = Astro.props;
 ---
 
 <dialog
-	id={id}
 	class={css({
 		width: "100vw",
 		height: "100vh",
@@ -29,7 +28,7 @@ const { id } = Astro.props;
 			animation: "slideFromBottom 0.2s ease-out",
 		})}
 	>
-		<Labels />
+		<Labels user={user} />
 		<div
 			class={css({
 				height: "5rem",

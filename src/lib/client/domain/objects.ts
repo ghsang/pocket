@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import {
-	categories, paymentMethods,
+	categories,
 } from './values';
 
 export const TransactionDaoSchema = v.object({
@@ -8,7 +8,7 @@ export const TransactionDaoSchema = v.object({
 	category: v.picklist(categories),
 	description: v.string([v.minLength(1)]),
 	amount: v.number(),
-	paymentMethod: v.picklist(paymentMethods),
+	paymentMethod: v.string([v.minLength(1)]),
 });
 
 export const TransactionDtoSchema = v.object({
@@ -17,7 +17,7 @@ export const TransactionDtoSchema = v.object({
 	category: v.picklist(categories),
 	description: v.string([v.minLength(1)]),
 	amount: v.number(),
-	paymentMethod: v.picklist(paymentMethods),
+	paymentMethod: v.string([v.minLength(1)]),
 });
 
 export type TransactionDao = v.Input<typeof TransactionDaoSchema>;

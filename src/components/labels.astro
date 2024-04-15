@@ -3,10 +3,11 @@ import { css } from "css";
 import { categories, paymentMethods, type TransactionDto } from "lib/client";
 
 interface Props {
+	user: string;
 	transaction?: TransactionDto;
 }
 
-const { transaction } = Astro.props;
+const { transaction, user } = Astro.props;
 ---
 
 <div
@@ -122,7 +123,7 @@ const { transaction } = Astro.props;
 			name="paymentMethod"
 			value={transaction?.paymentMethod ?? "현금"}
 		>
-			{paymentMethods.map((i) => <option value={i}>{i}</option>)}
+			{paymentMethods.get(user)!.map((i) => <option value={i}>{i}</option>)}
 		</select>
 	</label>
 </div>

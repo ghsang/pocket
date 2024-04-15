@@ -1,0 +1,65 @@
+---
+import "../../index.css";
+
+import { Image } from "astro:assets";
+import loginPng from "./kakao_login_medium_narrow.png";
+import { css } from "css";
+import { getSession } from "auth-astro/server";
+
+const session = await getSession(Astro.request);
+
+if (session) {
+	return Astro.redirect("/");
+}
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>가계부</title>
+	</head>
+	<main>
+		<login-handler>
+			<div
+				class={css({
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					height: "100vh",
+				})}
+			>
+				<button
+					class={"login " +
+						css({
+							padding: 0,
+							margin: 0,
+						})}
+				>
+					<Image src={loginPng} alt="kakao login" />
+				</button>
+			</div>
+		</login-handler>
+	</main>
+
+	<script>
+		import { signIn } from "auth-astro/client";
+
+		class Login extends HTMLElement {
+			constructor() {
+				super();
+
+				const button = this.querySelector("button.login") as HTMLButtonElement;
+
+				button.addEventListener("click", () => {
+					signIn("kakao");
+				});
+			}
+		}
+
+		customElements.define("login-handler", Login);
+	</script>
+
+
+</html>

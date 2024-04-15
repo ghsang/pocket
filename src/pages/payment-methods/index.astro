@@ -25,9 +25,8 @@ const paymentMethodinfo = await getPaymentMethodInfo();
 				})}
 			>
 				<tr>
-					<th class={css({ paddingY: "1rem", paddingLeft: "1rem" })}
-						>결제수단</th
-					>
+					<th class={css({ paddingY: "1rem", paddingLeft: "1rem" })}>소유</th>
+					<th>결제수단</th>
 					<th class={css({ paddingRight: "1rem" })}>사용</th>
 				</tr>
 			</thead>
@@ -44,7 +43,22 @@ const paymentMethodinfo = await getPaymentMethodInfo();
 					paymentMethodinfo !== undefined
 						? paymentMethodinfo.map((i) => (
 								<tr>
-									<td class={css({ textAlign: "center", paddingLeft: "1rem", paddingY: "1rem" })}>
+									<td
+										class={css({
+											textAlign: "center",
+											paddingLeft: "1rem",
+											paddingY: "1rem",
+										})}
+									>
+										{i.user}
+									</td>
+									<td
+										class={css({
+											textAlign: "center",
+											paddingLeft: "1rem",
+											paddingY: "1rem",
+										})}
+									>
 										{i.paymentMethod}
 									</td>
 									<td class={css({ paddingRight: "1rem" })}>

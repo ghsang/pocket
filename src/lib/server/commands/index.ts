@@ -193,13 +193,15 @@ export async function updateBudgets({category, amountChange}: {
 export async function getPaymentMethodInfo() {
 	return database.select({
 		amount: sum(transactions.amount),
+		user: transactions.user,
 		paymentMethod: transactions.paymentMethod,
 	})
 		.from(transactions)
 		.where(
 			gte(transactions.date, firstDayOfMonth()),
 		)
-		.groupBy(transactions.paymentMethod);
+		.groupBy(transactions.user, transactions.paymentMethod)
+		.orderBy(transactions.user);
 }
 
 function firstDayOfMonth() {

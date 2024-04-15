@@ -1,5 +1,5 @@
 {
-  "id": "36c77e9a-2920-4144-8af6-c7927a96b649",
+  "id": "bad1d2cd-a9a5-4a80-ad5f-e7761981898d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -38,6 +38,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "user": {
+          "name": "user",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "date": {
           "name": "date",
           "type": "date",
@@ -64,7 +70,7 @@
         },
         "payment_method": {
           "name": "payment_method",
-          "type": "payment_method",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -106,19 +112,6 @@
         "문화/여행비": "문화/여행비",
         "저축": "저축",
         "비자금": "비자금"
-      }
-    },
-    "payment_method": {
-      "name": "payment_method",
-      "values": {
-        "말랑 국민": "말랑 국민",
-        "말랑 신한 트레블": "말랑 신한 트레블",
-        "말랑 LG": "말랑 LG",
-        "복치 우리 생활비": "복치 우리 생활비",
-        "복치 우리 예비": "복치 우리 예비",
-        "복치 신한": "복치 신한",
-        "복치 신한 트레블": "복치 신한 트레블",
-        "현금": "현금"
       }
     }
   },
