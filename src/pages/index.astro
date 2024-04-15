@@ -29,7 +29,6 @@ const props = await getPagedTransactions({});
 		type TransactionDao,
 		type TransactionDto,
 		createTransactionElement,
-		toDate,
 	} from "lib/client";
 
 	class TransactionHandler extends HTMLElement {
@@ -48,9 +47,7 @@ const props = await getPagedTransactions({});
 
 			function getDateFromAnchorElement(a: HTMLAnchorElement) {
 				const span = a.querySelector("span") as HTMLSpanElement;
-
-				window.alert(`span.textContent: ${span.textContent}`);
-				return toDate(span.textContent!);
+				return new Date(span.dataset.date as string);
 			}
 
 			function closeDialog() {

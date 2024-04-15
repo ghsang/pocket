@@ -50,6 +50,7 @@ const { transactions, hasNext } = Astro.props;
 							class={css({
 								textAlign: "start",
 							})}
+							data-date={d.date}
 						>
 							{toDateString(d.date)}
 						</span>
