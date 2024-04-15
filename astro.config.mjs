@@ -23,7 +23,7 @@ export default defineConfig({
 	integrations: [
 		playformCompress(),
 		AstroPWA({
-			mode: 'development',
+			mode: 'production',
 			base: '/',
 			scope: '/',
 			includeAssets: ['favicon.svg'],
