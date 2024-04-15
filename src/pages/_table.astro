@@ -1,6 +1,6 @@
 ---
 import { css } from "css";
-import { type TransactionDto, convertDate } from "lib/client";
+import { type TransactionDto, toDateString } from "lib/client";
 
 interface Props {
 	transactions: TransactionDto[];
@@ -11,54 +11,66 @@ const { transactions, hasNext } = Astro.props;
 ---
 
 <fetch-more data-hasnext={hasNext}>
-	<div class={css({ height: "90vh" })}>
+	<div
+		class={css({
+			fontSize: "md",
+			textAlign: "center",
+			borderCollapse: "collapse",
+			borderSpacing: 0,
+			width: "100vw",
+			height: "90vh",
+			overflowY: "auto",
+			paddingBottom: "5rem",
+		})}
+	>
 		<div
-			class={css({
-				display: "block",
-				fontSize: "md",
-				textAlign: "center",
-				borderCollapse: "collapse",
-				borderSpacing: 0,
-				width: "100vw",
-				height: "100%",
-				overflowY: "auto",
-			})}
-		>
-			<div
-				class={"table " +
-					css({
-						"& > *": {
-							display: "grid",
-							gridTemplateColumns: "1fr 4fr 2fr",
-							paddingY: "1rem",
-							width: "100vw",
-							justifyContent: "space-between",
-							_odd: {
-								backgroundColor: "gray.100",
-							},
+			class={"table " +
+				css({
+					"& > *": {
+						display: "grid",
+						gridTemplateColumns: "1fr 4fr 2fr",
+						paddingY: "1rem",
+						width: "100vw",
+						justifyContent: "space-between",
+						_odd: {
+							backgroundColor: "gray.100",
 						},
-					})}
-			>
-				{
-					transactions.map((d) => (
-						<a 
-							href={`/transactions/${d.id}`} 
-							class={css({paddingX: 2})}
+					},
+				})}
+		>
+			{
+				transactions.map((d) => (
+					<a
+						href={`/transactions/${d.id}`}
+						class={css({
+							paddingX: 2,
+						})}
+					>
+						<span
+							class={css({
+								textAlign: "start",
+							})}
 						>
-							<span>{convertDate(d.date)}</span>
-							<span>{d.description}</span>
-							<span>{d.amount.toLocaleString()}</span>
-						</a>
-					))
-				}
-			</div>
-			<div class="loader"></div>
+							{toDateString(d.date)}
+						</span>
+						<span>{d.description}</span>
+						<span
+							class={css({
+								textAlign: "end",
+							})}
+						>
+							{d.amount.toLocaleString()}
+						</span>
+					</a>
+				))
+			}
 		</div>
+		<div class="loader"></div>
 	</div>
 </fetch-more>
 
 <script>
-	import { type TransactionDto, convertDate } from "lib/client";
+	import { type TransactionDto, createTransactionElement } from "lib/client";
 
 	class FetchMore extends HTMLElement {
 		constructor() {
@@ -77,20 +89,6 @@ const { transactions, hasNext } = Astro.props;
 			};
 
 			const table = this.querySelector(".table");
-
-			function createTransactionElement(d: TransactionDto) {
-				const a = document.createElement("a");
-
-				a.setAttribute("href", `/transactions/${d.id}`);
-
-				a.innerHTML = `
-					<span>${convertDate(d.date)}</span>
-					<span>${d.description}</span>
-					<span>${d.amount.toLocaleString()}</span>
-				`;
-
-				return a;
-			}
 
 			const observer = new IntersectionObserver(async (entries) => {
 				if (entries[0]!.isIntersecting) {

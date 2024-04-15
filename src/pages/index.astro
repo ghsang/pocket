@@ -25,7 +25,12 @@ const props = await getPagedTransactions({});
 </style>
 
 <script>
-	import type { TransactionDao } from "lib/client";
+	import {
+		type TransactionDao,
+		type TransactionDto,
+		createTransactionElement,
+		toDate,
+	} from "lib/client";
 
 	class TransactionHandler extends HTMLElement {
 		constructor() {
@@ -41,25 +46,11 @@ const props = await getPagedTransactions({});
 
 			const form = this.querySelector("form") as HTMLFormElement;
 
-			function createAnchor(data: any) {
-				const a = document.createElement("a");
-
-				a.setAttribute("href", `/transactions/${data.id}`);
-
-				a.innerHTML = `
-					<span>${data.date}</span>
-					<span>${data.description}</span>
-					<span>${data.amount}</span>
-				`;
-
-				a.style.animation = "tempBgColorChange 0.8s ease-in-out forwards";
-
-				return a;
-			}
-
 			function getDateFromAnchorElement(a: HTMLAnchorElement) {
 				const span = a.querySelector("span") as HTMLSpanElement;
-				return new Date(span.textContent!);
+
+				window.alert(`span.textContent: ${span.textContent}`);
+				return toDate(span.textContent!);
 			}
 
 			function closeDialog() {
@@ -92,7 +83,11 @@ const props = await getPagedTransactions({});
 					body: JSON.stringify(data),
 				}).then((response) => response.json());
 
-				const a = createAnchor({ id, ...data });
+				const a = createTransactionElement({
+					id,
+					...data,
+					date: data.date.toString(),
+				} as TransactionDto);
 
 				let inserted = false;
 
@@ -102,26 +97,22 @@ const props = await getPagedTransactions({});
 					if (new Date(data.date) >= date) {
 						table.insertBefore(a, r);
 
-						a.scrollIntoView({
-							block: "center",
-							behavior: "instant",
-						});
-
-						closeDialog();
-
 						inserted = true;
 
-						return;
+						break;
 					}
 				}
 
 				if (!inserted) {
 					table.appendChild(a);
-
-					closeDialog();
-
-					return;
 				}
+
+				closeDialog();
+
+				a.scrollIntoView({
+					block: "center",
+					behavior: "instant",
+				});
 			});
 
 			dialog.addEventListener("click", (event) => {

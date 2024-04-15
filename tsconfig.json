@@ -21,6 +21,7 @@
     }
   },
   "include": [
+    "./src/",
     "vite-plugin-pwa/vanillajs",
     "vite-plugin-pwa/info"
   ]

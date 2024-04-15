@@ -5,9 +5,9 @@ import { css } from "css";
 <div
 	class={"form-open " +
 		css({
-			position: "sticky",
+			position: "absolute",
 			bottom: 0,
-			bgTransparency: 1.0,
+			width: "100vw",
 			height: "5rem",
 			fontSize: "xl",
 			fontWeight: "bold",
@@ -29,6 +29,7 @@ import { css } from "css";
 				backgroundColor: "black",
 				color: "white",
 				boxShadow: "xl",
+				zIndex: 10,
 				_active: {
 					scale: 0.98,
 				},
