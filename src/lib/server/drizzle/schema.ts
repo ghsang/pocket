@@ -8,7 +8,7 @@ export const category = pgEnum('category', categories as [string, ...string[]]);
 
 export const transactions = pgTable('transactions', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	user: text('user'),
+	user: text('user').notNull(),
 	date: date('date').notNull(),
 	category: category('category').notNull(),
 	description: text('description').notNull(),

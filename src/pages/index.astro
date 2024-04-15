@@ -16,7 +16,7 @@ const props = await getPagedTransactions({});
 ---
 
 <Layout>
-	<transaction-handler>
+	<transaction-handler data-user={session.user.name}>
 		<Table transactions={props.data} hasNext={props.hasNext} />
 		<FormOpenButton />
 		<AddTransactionForm user={session.user.name} />
@@ -76,7 +76,11 @@ const props = await getPagedTransactions({});
 
 				const formData = new FormData(form);
 				const tmp = Object.fromEntries(formData.entries());
-				const data = { ...tmp, amount: Number(tmp.amount) } as TransactionDao;
+				const data = {
+					...tmp,
+					user: this.dataset!.user!,
+					amount: Number(tmp.amount),
+				} as TransactionDao;
 
 				const table = this.querySelector(".table") as HTMLDivElement;
 				const allRows = table.getElementsByTagName("a");

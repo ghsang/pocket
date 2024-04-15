@@ -8,6 +8,20 @@
       "when": 1713162616417,
       "tag": "0000_jittery_toad_men",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1713179185242,
+      "tag": "0001_neat_warlock",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1713179230484,
+      "tag": "0002_typical_microchip",
+      "breakpoints": true
     }
   ]
 }
