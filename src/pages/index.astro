@@ -44,13 +44,35 @@ const props = await getPagedTransactions({});
 
 			const formOpenDiv = this.querySelector("div.form-open") as HTMLDivElement;
 
+			if (formOpenDiv === null) {
+				throw new Error("formOpenDiv not found");
+			}
+
 			const formOpenButton = this.querySelector(
 				"button.form-open",
 			) as HTMLButtonElement;
 
+			if (formOpenButton === null) {
+				throw new Error("formOpenButton not found");
+			}
+
 			const dialog = this.querySelector("dialog") as HTMLDialogElement;
 
+			if (dialog === null) {
+				throw new Error("dialog not found");
+			}
+
 			const form = this.querySelector("form") as HTMLFormElement;
+
+			if (form === null) {
+				throw new Error("form not found");
+			}
+
+			const template = this.querySelector("template") as HTMLTemplateElement;
+
+			if (template === null) {
+				throw new Error("template not found");
+			}
 
 			function getDateFromAnchorElement(a: HTMLAnchorElement) {
 				const span = a.querySelector("span") as HTMLSpanElement;
@@ -91,7 +113,7 @@ const props = await getPagedTransactions({});
 					body: JSON.stringify(data),
 				}).then((response) => response.json());
 
-				const a = createTransactionElement({
+				const a = createTransactionElement(template, {
 					id,
 					...data,
 					date: data.date.toString(),

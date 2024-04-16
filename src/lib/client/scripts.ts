@@ -1,19 +1,16 @@
 import {type TransactionDto} from 'lib/client';
 
-export function createTransactionElement(d: TransactionDto) {
-	const a = document.createElement('a');
+export function createTransactionElement(template: HTMLTemplateElement, d: TransactionDto) {
+	const temporary = template.content.cloneNode(true) as HTMLAnchorElement;
+
+	const a = temporary.querySelector('a')!;
 
 	a.setAttribute('href', `/transactions/${d.id}`);
 
-	a.classList.add('px_2');
-
-	a.innerHTML = `
-					<span class="text-align_start" data-date=${d.date}>${toDateString(d.date)}</span>
-					<span>${d.description}</span>
-					<span class="text-align_end">${d.amount.toLocaleString()}</span>
-				`;
-
-	a.style.animation = 'tempBgColorChange 0.8s ease-in-out';
+	a.querySelector('span:nth-of-type(1)')!.textContent = toDateString(d.date);
+	a.querySelector('span:nth-of-type(2)')!.textContent = d.description;
+	a.querySelector('span:nth-of-type(3)')!.textContent
+		= d.amount.toLocaleString();
 
 	return a;
 }

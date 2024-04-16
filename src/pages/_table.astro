@@ -11,6 +11,24 @@ const { transactions, hasNext } = Astro.props;
 ---
 
 <fetch-more data-hasnext={hasNext}>
+	<template>
+		<a
+			class={css({
+				paddingX: 2,
+				animation: "tempBgColorChange 0.8s ease-in-out",
+			})}
+		>
+			<span
+				class={css({
+					textAlign: "start",
+				})}></span>
+			<span></span>
+			<span
+				class={css({
+					textAlign: "end",
+				})}></span>
+		</a>
+	</template>
 	<div
 		class={css({
 			fontSize: "md",
@@ -71,7 +89,7 @@ const { transactions, hasNext } = Astro.props;
 </fetch-more>
 
 <script>
-	import { type TransactionDto, createTransactionElement } from "lib/client";
+	import { createTransactionElement, type TransactionDto } from "lib/client";
 
 	class FetchMore extends HTMLElement {
 		constructor() {
@@ -91,6 +109,16 @@ const { transactions, hasNext } = Astro.props;
 
 			const table = this.querySelector(".table");
 
+			if (table === null) {
+				throw new Error("table not found");
+			}
+
+			const template = this.querySelector("template")!;
+
+			if (template === null) {
+				throw new Error("template not found");
+			}
+
 			const observer = new IntersectionObserver(async (entries) => {
 				if (entries[0]!.isIntersecting) {
 					if (!state.hasNext) {
@@ -108,9 +136,9 @@ const { transactions, hasNext } = Astro.props;
 					});
 
 					for (const d of data) {
-						const el = createTransactionElement(d);
+						const a = createTransactionElement(template, d);
 
-						table!.appendChild(el);
+						table!.appendChild(a);
 					}
 
 					state = { startAfter, hasNext, initial: false };
