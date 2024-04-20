@@ -21,6 +21,9 @@ export default defineConfig({
 			},
 		},
 	},
+	prefetch: {
+		defaultStrategy: 'viewport',
+	},
 	integrations: [playformCompress(), AstroPWA({
 		base: '/',
 		scope: '/',
