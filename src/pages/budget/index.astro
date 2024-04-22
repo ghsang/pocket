@@ -2,8 +2,13 @@
 import { getBudgets } from "lib/server";
 import Layout from "../_layout.astro";
 import { css } from "css";
+import {nanoid} from "nanoid";
 
-const budgets = await getBudgets();
+const budgets = await getBudgets({
+	traceId: nanoid(),
+	parentSpanId: "/pages/budgets.astro",
+	arguments_: {},
+});
 ---
 
 <Layout>

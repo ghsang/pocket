@@ -90,13 +90,21 @@ const { transactions, hasNext } = Astro.props;
 
 <script>
 	import { createTransactionElement, type TransactionDto } from "lib/client";
+  import { nanoid } from "nanoid";
 
 	class FetchMore extends HTMLElement {
 		constructor() {
 			super();
 
 			async function fetchTransactions({ startAfter }: { startAfter: string }) {
-				return (await fetch(`/api/paged-transactions/${startAfter}.json`).then(
+				return (await fetch(
+					`/api/paged-transactions/${startAfter}.json`, {
+					headers: {
+						"Content-Type": "application/json",
+						"X-B3-TraceId": nanoid(),
+						"X-B3-ParentSpanId": "/pages/index/fetch-more",
+					},
+				}).then(
 					(response) => response.json(),
 				)) as { data: TransactionDto[]; startAfter: string; hasNext: boolean };
 			}

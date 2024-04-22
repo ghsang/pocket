@@ -29,40 +29,44 @@ export default defineConfig({
 	prefetch: {
 		defaultStrategy: 'viewport',
 	},
-	integrations: [playformCompress(), AstroPWA({
-		base: '/',
-		scope: '/',
-		includeAssets: ['favicon.svg'],
-		registerType: 'autoUpdate',
-		manifest: {
-			name: '가계부',
-			short_name: '가계부',
-			theme_color: '#ffffff',
-			icons: [{
-				src: 'icon-192x192.png',
-				sizes: '192x192',
-				type: 'image/png',
-			}, {
-				src: 'icon-512x512.png',
-				sizes: '512x512',
-				type: 'image/png',
-			}, {
-				src: 'icon-512x512.png',
-				sizes: '512x512',
-				type: 'image/png',
-				purpose: 'any maskable',
-			}],
-		},
-		workbox: {
-			navigateFallback: '/',
-			globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}'],
-		},
-		devOptions: {
-			enabled: true,
-			navigateFallbackAllowlist: [/^\//],
-		},
-		experimental: {
-			directoryAndTrailingSlashHandler: true,
-		},
-	}), auth()],
+	integrations: [
+		playformCompress(),
+		AstroPWA({
+			base: '/',
+			scope: '/',
+			includeAssets: ['favicon.svg'],
+			registerType: 'autoUpdate',
+			manifest: {
+				name: '가계부',
+				short_name: '가계부',
+				theme_color: '#ffffff',
+				icons: [{
+					src: 'icon-192x192.png',
+					sizes: '192x192',
+					type: 'image/png',
+				}, {
+					src: 'icon-512x512.png',
+					sizes: '512x512',
+					type: 'image/png',
+				}, {
+					src: 'icon-512x512.png',
+					sizes: '512x512',
+					type: 'image/png',
+					purpose: 'any maskable',
+				}],
+			},
+			workbox: {
+				navigateFallback: '/',
+				globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}'],
+			},
+			devOptions: {
+				enabled: true,
+				navigateFallbackAllowlist: [/^\//],
+			},
+			experimental: {
+				directoryAndTrailingSlashHandler: true,
+			},
+		}),
+		auth(),
+	],
 });

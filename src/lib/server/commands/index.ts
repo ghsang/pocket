@@ -2,9 +2,44 @@ import {
 	desc, eq, gte, lt, sum,
 } from 'drizzle-orm';
 import type {Category} from 'lib/client';
+import pino from 'pino';
 import {transactions, database, budgets} from '../drizzle';
 
-export async function getPagedTransactions({startAfter = new Date(), limit = 50}: {
+export const observable = <Arguments extends Record<string, unknown>, Return>({spanId, command}: {
+	spanId: string;
+	command: (arguments_: Arguments) => Promise<Return>;
+}) => {
+	const logger = pino().child({
+		spanId,
+	});
+
+	return async ({traceId, parentSpanId, arguments_}: {
+		traceId: string;
+		parentSpanId: string;
+		arguments_: Arguments;
+	}) => {
+		const start = Date.now();
+
+		logger.info({
+			traceId,
+			parentSpanId,
+			message: 'invoked',
+		});
+
+		const result = await command(arguments_);
+
+		logger.info({
+			traceId,
+			parentSpanId,
+			duration: Date.now() - start,
+			message: 'done',
+		});
+
+		return result;
+	};
+};
+
+async function _getPagedTransactions({startAfter = new Date(), limit = 50}: {
 	startAfter?: Date | undefined;
 	limit?: number;
 }) {
@@ -22,7 +57,12 @@ export async function getPagedTransactions({startAfter = new Date(), limit = 50}
 	};
 }
 
-export async function createTransaction(data: typeof transactions.$inferInsert): Promise<{id: string}> {
+export const getPagedTransactions = observable({
+	spanId: 'getPagedTransactions',
+	command: _getPagedTransactions,
+});
+
+async function _createTransaction(data: typeof transactions.$inferInsert): Promise<{id: string}> {
 	return database.transaction(async tx => {
 		const current = await tx.query.budgets.findFirst();
 
@@ -84,14 +124,24 @@ export async function createTransaction(data: typeof transactions.$inferInsert):
 	});
 }
 
-export async function getTransactionById(id: string) {
+export const createTransaction = observable({
+	spanId: 'createTransaction',
+	command: _createTransaction,
+});
+
+async function _getTransactionById({id}: {id: string}) {
 	return database.query.transactions
 		.findFirst({
 			where: eq(transactions.id, id),
 		});
 }
 
-export async function deleteTransactionById(id: string) {
+export const getTransactionById = observable({
+	spanId: 'getTransactionById',
+	command: _getTransactionById,
+});
+
+async function _deleteTransactionById({id}: {id: string}) {
 	return database.transaction(async tx => {
 		const current = await tx.query.budgets.findFirst();
 
@@ -118,7 +168,12 @@ export async function deleteTransactionById(id: string) {
 	});
 }
 
-export async function updateTransactionById(id: string, data: typeof transactions.$inferInsert) {
+export const deleteTransactionById = observable({
+	spanId: 'deleteTransactionById',
+	command: _deleteTransactionById,
+});
+
+async function _updateTransactionById({id, data}: {id: string; data: typeof transactions.$inferInsert}) {
 	return database.transaction(async tx => {
 		const updateTransaction = tx
 			.update(transactions)
@@ -151,11 +206,21 @@ export async function updateTransactionById(id: string, data: typeof transaction
 	});
 }
 
-export async function getBudgets() {
+export const updateTransactionById = observable({
+	spanId: 'updateTransactionById',
+	command: _updateTransactionById,
+});
+
+async function _getBudgets() {
 	return database.query.budgets.findFirst();
 }
 
-export async function updateBudgets({category, amountChange}: {
+export const getBudgets = observable({
+	spanId: 'getBudgets',
+	command: _getBudgets,
+});
+
+async function _updateBudgets({category, amountChange}: {
 	category: Category;
 	amountChange: number;
 }) {
@@ -190,7 +255,12 @@ export async function updateBudgets({category, amountChange}: {
 	});
 }
 
-export async function getPaymentMethodInfo() {
+export const updateBudgets = observable({
+	spanId: 'updateBudgets',
+	command: _updateBudgets,
+});
+
+async function _getPaymentMethodInfo() {
 	return database.select({
 		amount: sum(transactions.amount),
 		user: transactions.user,
@@ -203,6 +273,11 @@ export async function getPaymentMethodInfo() {
 		.groupBy(transactions.user, transactions.paymentMethod)
 		.orderBy(transactions.user);
 }
+
+export const getPaymentMethodInfo = observable({
+	spanId: 'getPaymentMethodInfo',
+	command: _getPaymentMethodInfo,
+});
 
 function firstDayOfMonth() {
 	const now = new Date();

@@ -1,12 +1,24 @@
 import type {APIContext} from 'astro';
 import {
-	deleteTransactionById, getTransactionById, type transactions, updateTransactionById,
+	getTransactionById, type transactions, deleteTransactionById, updateTransactionById,
 } from 'lib/server';
 
-export async function GET({params}: APIContext) {
+export async function GET({params, request}: APIContext) {
 	const id = params.id!;
 
-	const transaction = await getTransactionById(id);
+	const parentSpanId = request.headers.get('X-B3-ParentSpanId');
+
+	if (!parentSpanId) {
+		throw new Error('Missing X-B3-ParentSpanId header');
+	}
+
+	const traceId = request.headers.get('X-B3-TraceId');
+
+	if (!traceId) {
+		throw new Error('Missing X-B3-TraceId header');
+	}
+
+	const transaction = await getTransactionById({traceId, parentSpanId, arguments_: {id}});
 
 	return new Response(
 		JSON.stringify(transaction),
@@ -19,10 +31,22 @@ export async function GET({params}: APIContext) {
 	);
 }
 
-export async function DELETE({params}: APIContext) {
+export async function DELETE({params, request}: APIContext) {
 	const id = params.id!;
 
-	await deleteTransactionById(id);
+	const parentSpanId = request.headers.get('X-B3-ParentSpanId');
+
+	if (!parentSpanId) {
+		throw new Error('Missing X-B3-ParentSpanId header');
+	}
+
+	const traceId = request.headers.get('X-B3-TraceId');
+
+	if (!traceId) {
+		throw new Error('Missing X-B3-TraceId header');
+	}
+
+	await deleteTransactionById({traceId, parentSpanId, arguments_: {id}});
 
 	return new Response(
 		undefined,
@@ -33,11 +57,23 @@ export async function DELETE({params}: APIContext) {
 }
 
 export async function PATCH({params, request}: APIContext) {
+	const parentSpanId = request.headers.get('X-B3-ParentSpanId');
+
+	if (!parentSpanId) {
+		throw new Error('Missing X-B3-ParentSpanId header');
+	}
+
+	const traceId = request.headers.get('X-B3-TraceId');
+
+	if (!traceId) {
+		throw new Error('Missing X-B3-TraceId header');
+	}
+
 	const id = params.id!;
 
 	const body = await request.json() as typeof transactions.$inferInsert;
 
-	await updateTransactionById(id, body);
+	await updateTransactionById({traceId, parentSpanId, arguments_: {id, data: body}});
 
 	return new Response(
 		undefined,

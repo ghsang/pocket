@@ -2,8 +2,9 @@
 import "../../index.css";
 import Labels from "components/labels.astro";
 import { css } from "css";
-import type { TransactionDto } from "lib/client";
+import { getTransactionById } from "lib/server";
 import { getSession } from "auth-astro/server";
+import {nanoid} from "nanoid";
 
 const session = await getSession(Astro.request);
 
@@ -13,9 +14,11 @@ if (!session || !session.user?.name) {
 
 const { id } = Astro.params;
 
-const transaction = (await fetch(
-	`${Astro.url.origin}/api/transactions/${id}.json`,
-).then((response) => response.json())) as TransactionDto;
+const transaction = await getTransactionById({
+	traceId: nanoid(), 
+	parentSpanId: "/pages/transactions/[id].astro", 
+	arguments_: {id: id!}
+});
 ---
 
 <html lang="en">
@@ -36,7 +39,7 @@ const transaction = (await fetch(
 					justifyContent: "center",
 				})}
 			>
-				<Labels transaction={transaction} user={session.user.name} />
+				{transaction && <Labels transaction={transaction} user={session.user.name} />}
 				<div
 					class={css({
 						marginTop: "2rem",
@@ -89,6 +92,7 @@ const transaction = (await fetch(
 
 <script>
 	import { navigate } from "astro:transitions/client";
+  import { nanoid } from "nanoid";
 
 	class DetailFormHandler extends HTMLElement {
 		constructor() {
@@ -115,6 +119,11 @@ const transaction = (await fetch(
 
 				await fetch(`/api/transactions/${form.dataset.id}.json`, {
 					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+						"X-B3-TraceId": nanoid(),
+						"X-B3-ParentSpanId": "/pages/transactions/[id].astro",
+					},
 				});
 
 				navigate("/");
@@ -129,6 +138,8 @@ const transaction = (await fetch(
 					method: "PATCH",
 					headers: {
 						"Content-Type": "application/json",
+						"X-B3-TraceId": nanoid(),
+						"X-B3-ParentSpanId": "/pages/transactions/[id].astro",
 					},
 					body: JSON.stringify(data),
 				});

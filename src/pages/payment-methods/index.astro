@@ -2,8 +2,13 @@
 import { getPaymentMethodInfo } from "lib/server";
 import Layout from "../_layout.astro";
 import { css } from "css";
+import { nanoid } from "nanoid";
 
-const paymentMethodinfo = await getPaymentMethodInfo();
+const paymentMethodinfo = await getPaymentMethodInfo({
+	traceId: nanoid(),
+	parentSpanId: "/pages/payment-methods.astro",
+	arguments_: {},
+});
 ---
 
 <Layout>

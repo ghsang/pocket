@@ -5,6 +5,7 @@ import AddTransactionForm from "./_add-transaction-form.astro";
 import Layout from "./_layout.astro";
 import { getPagedTransactions } from "lib/server";
 import { getSession } from "auth-astro/server";
+import {nanoid} from "nanoid";
 
 const session = await getSession(Astro.request);
 
@@ -12,7 +13,11 @@ if (!session || session.user === undefined) {
 	return Astro.redirect("/login");
 }
 
-const props = await getPagedTransactions({});
+const props = await getPagedTransactions({
+	traceId: nanoid(),
+	parentSpanId: '/pages/index',
+	arguments_: {}
+});
 ---
 
 <Layout>
@@ -37,6 +42,7 @@ const props = await getPagedTransactions({});
 		type TransactionDto,
 		createTransactionElement,
 	} from "lib/client";
+  import { nanoid } from "nanoid";
 
 	class TransactionHandler extends HTMLElement {
 		constructor() {
@@ -109,7 +115,11 @@ const props = await getPagedTransactions({});
 
 				const { id } = await fetch("/api/transactions.json", {
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
+					headers: { 
+						"Content-Type": "application/json",
+						"X-B3-TraceId": nanoid(),
+						"X-B3-ParentSpanId": "/pages/index/scroll",
+					},
 					body: JSON.stringify(data),
 				}).then((response) => response.json());
 
