@@ -2,7 +2,6 @@
 /* eslint-disable camelcase */
 import {defineConfig} from 'astro/config';
 import vercel from '@astrojs/vercel/serverless';
-import playformCompress from '@playform/compress';
 import AstroPWA from '@vite-pwa/astro';
 import auth from 'auth-astro';
 
@@ -30,7 +29,6 @@ export default defineConfig({
 		defaultStrategy: 'viewport',
 	},
 	integrations: [
-		playformCompress(),
 		AstroPWA({
 			base: '/',
 			scope: '/',
