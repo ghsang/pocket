@@ -1,5 +1,5 @@
 import {
-	desc, eq, gte, lt, sum,
+	desc, eq, gte, lt, sql, sum,
 } from 'drizzle-orm';
 import type {Category} from 'lib/client';
 import pino from 'pino';
@@ -70,14 +70,14 @@ async function _createTransaction(data: typeof transactions.$inferInsert): Promi
 
 		if (current === undefined) {
 			const createBudget = tx.insert(budgets).values({
-				value: [
+				value: sql`${[
 					{
 						category: data.category,
 						current: data.amount,
 						budget: 500_000,
 						remain: 500_000 - data.amount,
 					},
-				],
+				]}::json`,
 			});
 
 			const [,transaction] = await Promise.all([
@@ -93,18 +93,18 @@ async function _createTransaction(data: typeof transactions.$inferInsert): Promi
 		const updateBudget = isCategoryExist
 			? tx.update(budgets)
 				.set({
-					value: current.value.map(b => (
+					value: sql`${current.value.map(b => (
 						b.category === data.category
 							? ({
 								...b,
 								current: b.current + data.amount,
 								remain: b.remain - data.amount,
 							})
-							: b)),
+							: b))}::json`,
 				})
 			: tx.update(budgets)
 				.set({
-					value: [
+					value: sql`${[
 						{
 							category: data.category,
 							current: data.amount,
@@ -112,7 +112,7 @@ async function _createTransaction(data: typeof transactions.$inferInsert): Promi
 							remain: 500_000 - data.amount,
 						},
 						...current.value,
-					],
+					]}::json`,
 				});
 
 		const [,transaction] = await Promise.all([
@@ -192,14 +192,16 @@ async function _updateTransactionById({id, data}: {id: string; data: typeof tran
 		const updateBudget = tx
 			.update(budgets)
 			.set({
-				value: currentBudget!.value.map(b => (
-					b.category === data.category
-						? ({
-							...b,
-							current: b.current + changedAmount,
-							remain: b.remain - changedAmount,
-						})
-						: b)),
+				value: sql`
+					${currentBudget!.value.map(b => (
+		b.category === data.category
+			? ({
+				...b,
+				current: b.current + changedAmount,
+				remain: b.remain - changedAmount,
+			})
+			: b))}::json
+				`,
 			});
 
 		await Promise.all([updateTransaction, updateBudget]);
@@ -229,28 +231,28 @@ async function _updateBudgets({category, amountChange}: {
 
 		if (current === undefined) {
 			return tx.insert(budgets).values({
-				value: [
+				value: sql`${[
 					{
 						category,
 						current: amountChange,
 						budget: 500_000,
 						remain: 500_000 - amountChange,
 					},
-				],
+				]}::json`,
 			});
 		}
 
 		return tx
 			.update(budgets)
 			.set({
-				value: current.value.map(b => (
+				value: sql`${current.value.map(b => (
 					b.category === category.toString()
 						? ({
 							...b,
 							current: b.current + amountChange,
 							remain: b.remain - amountChange,
 						})
-						: b)),
+						: b))}::json`,
 			});
 	});
 }

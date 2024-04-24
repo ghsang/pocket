@@ -34,3 +34,12 @@ styled-system-studio
 coc-settings.json
 
 dev-dist
+
+.envrc
+
+**/.terraform/*
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+
+cloud/build/*

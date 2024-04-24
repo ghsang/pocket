@@ -12,7 +12,6 @@ export default defineConfig({
 		webAnalytics: {
 			enabled: true,
 		},
-		functionPerRoute: true,
 	}),
 	vite: {
 		logLevel: 'info',
