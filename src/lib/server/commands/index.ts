@@ -1,5 +1,5 @@
 import {
-	desc, eq, gte, lt, sql, sum,
+	desc, eq, gte, lt, sum,
 } from 'drizzle-orm';
 import type {Category} from 'lib/client';
 import pino from 'pino';
@@ -26,16 +26,26 @@ export const observable = <Arguments extends Record<string, unknown>, Return>({s
 			message: 'invoked',
 		});
 
-		const result = await command(arguments_);
+		try {
+			const result = await command(arguments_);
 
-		logger.info({
-			traceId,
-			parentSpanId,
-			duration: Date.now() - start,
-			message: 'done',
-		});
+			logger.info({
+				traceId,
+				parentSpanId,
+				duration: Date.now() - start,
+				message: 'done',
+			});
 
-		return result;
+			return result;
+		} catch (error) {
+			logger.error({
+				traceId,
+				parentSpanId,
+				message: error,
+			});
+
+			throw error;
+		}
 	};
 };
 
@@ -70,14 +80,14 @@ async function _createTransaction(data: typeof transactions.$inferInsert): Promi
 
 		if (current === undefined) {
 			const createBudget = tx.insert(budgets).values({
-				value: sql`${[
+				value: [
 					{
 						category: data.category,
 						current: data.amount,
 						budget: 500_000,
 						remain: 500_000 - data.amount,
 					},
-				]}::json`,
+				],
 			});
 
 			const [,transaction] = await Promise.all([
@@ -93,18 +103,18 @@ async function _createTransaction(data: typeof transactions.$inferInsert): Promi
 		const updateBudget = isCategoryExist
 			? tx.update(budgets)
 				.set({
-					value: sql`${current.value.map(b => (
+					value: current.value.map(b => (
 						b.category === data.category
 							? ({
 								...b,
 								current: b.current + data.amount,
 								remain: b.remain - data.amount,
 							})
-							: b))}::json`,
+							: b)),
 				})
 			: tx.update(budgets)
 				.set({
-					value: sql`${[
+					value: [
 						{
 							category: data.category,
 							current: data.amount,
@@ -112,7 +122,7 @@ async function _createTransaction(data: typeof transactions.$inferInsert): Promi
 							remain: 500_000 - data.amount,
 						},
 						...current.value,
-					]}::json`,
+					],
 				});
 
 		const [,transaction] = await Promise.all([
@@ -192,16 +202,15 @@ async function _updateTransactionById({id, data}: {id: string; data: typeof tran
 		const updateBudget = tx
 			.update(budgets)
 			.set({
-				value: sql`
-					${currentBudget!.value.map(b => (
-		b.category === data.category
-			? ({
-				...b,
-				current: b.current + changedAmount,
-				remain: b.remain - changedAmount,
-			})
-			: b))}::json
-				`,
+				value:
+					currentBudget!.value.map(b => (
+						b.category === data.category
+							? ({
+								...b,
+								current: b.current + changedAmount,
+								remain: b.remain - changedAmount,
+							})
+							: b)),
 			});
 
 		await Promise.all([updateTransaction, updateBudget]);
@@ -231,28 +240,28 @@ async function _updateBudgets({category, amountChange}: {
 
 		if (current === undefined) {
 			return tx.insert(budgets).values({
-				value: sql`${[
+				value: [
 					{
 						category,
 						current: amountChange,
 						budget: 500_000,
 						remain: 500_000 - amountChange,
 					},
-				]}::json`,
+				],
 			});
 		}
 
 		return tx
 			.update(budgets)
 			.set({
-				value: sql`${current.value.map(b => (
+				value: current.value.map(b => (
 					b.category === category.toString()
 						? ({
 							...b,
 							current: b.current + amountChange,
 							remain: b.remain - amountChange,
 						})
-						: b))}::json`,
+						: b)),
 			});
 	});
 }
