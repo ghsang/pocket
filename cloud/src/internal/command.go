@@ -50,13 +50,13 @@ type monthlyBudget struct {
 }
 
 var monthlyBudgets = []monthlyBudget{
-	{Category: "생활비", Budget: 1642710},
-	{Category: "용돈", Budget: 500000},
-	{Category: "경조사비", Budget: 1000000},
-	{Category: "문화/여행비", Budget: 1000000},
-	{Category: "비자금", Budget: 500000},
-	{Category: "저축", Budget: 500000},
-	{Category: "고정지출", Budget: 500000},
+	{Category: "생활비", Budget: 100_0000},
+	{Category: "용돈", Budget: 50_0000},
+	{Category: "경조사비", Budget: 100_0000},
+	{Category: "문화/여행비", Budget: 100_0000},
+	{Category: "비자금", Budget: 50_0000},
+	{Category: "저축", Budget: 300_0000},
+	{Category: "고정지출", Budget: 350_4420},
 }
 
 func UpdateBudget(ctx context.Context, client *ent.Client) error {

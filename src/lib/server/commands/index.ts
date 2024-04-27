@@ -254,16 +254,7 @@ async function _updateBudgets({category, amountChange}: {
 		const current = await tx.query.budgets.findFirst();
 
 		if (current === undefined) {
-			return tx.insert(budgets).values({
-				value: [
-					{
-						category,
-						current: amountChange,
-						budget: 500_000,
-						remain: 500_000 - amountChange,
-					},
-				],
-			});
+			throw new Error('Budgets not found');
 		}
 
 		return tx
