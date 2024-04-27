@@ -155,6 +155,10 @@ const props = await getPagedTransactions({
 					block: "center",
 					behavior: "smooth",
 				});
+
+				setTimeout(() => {
+					a.style.animation = "";
+				}, 200);
 			});
 
 			dialog.addEventListener("click", (event) => {
