@@ -79,51 +79,26 @@ async function _createTransaction(data: typeof transactions.$inferInsert): Promi
 		const createTransaction_ = tx.insert(transactions).values(data).returning({id: transactions.id});
 
 		if (current === undefined) {
-			const createBudget = tx.insert(budgets).values({
-				value: [
-					{
-						category: data.category,
-						current: data.amount,
-						budget: 500_000,
-						remain: 500_000 - data.amount,
-					},
-				],
-			});
-
-			const [,transaction] = await Promise.all([
-				createBudget,
-				createTransaction_,
-			]);
-
-			return transaction[0]!;
+			throw new Error('Budgets not found');
 		}
 
-		const isCategoryExist = current.value.some(b => b.category === data.category);
+		const isCategoryNotExist = !current.value.some(b => b.category === data.category);
 
-		const updateBudget = isCategoryExist
-			? tx.update(budgets)
-				.set({
-					value: current.value.map(b => (
-						b.category === data.category
-							? ({
-								...b,
-								current: b.current + data.amount,
-								remain: b.remain - data.amount,
-							})
-							: b)),
-				})
-			: tx.update(budgets)
-				.set({
-					value: [
-						{
-							category: data.category,
-							current: data.amount,
-							budget: 500_000,
-							remain: 500_000 - data.amount,
-						},
-						...current.value,
-					],
-				});
+		if (isCategoryNotExist) {
+			throw new Error('Category not found');
+		}
+
+		const updateBudget = tx.update(budgets)
+			.set({
+				value: current.value.map(b => (
+					b.category === data.category
+						? ({
+							...b,
+							current: b.current + data.amount,
+							remain: b.remain - data.amount,
+						})
+						: b)),
+			});
 
 		const [,transaction] = await Promise.all([
 			updateBudget,
@@ -197,13 +172,22 @@ async function _updateTransactionById({id, data}: {id: string; data: typeof tran
 			}),
 		]);
 
-		const changedAmount = data.amount - currentTransaction!.amount;
+		if (currentBudget === undefined) {
+			throw new Error('Budgets not found');
+		}
 
-		const updateBudget = tx
-			.update(budgets)
-			.set({
-				value:
-					currentBudget!.value.map(b => (
+		if (currentTransaction === undefined) {
+			throw new Error('Transaction not found');
+		}
+
+		if (currentTransaction.category === data.category) {
+			const changedAmount = data.amount - currentTransaction.amount;
+
+			const updateBudget = tx
+				.update(budgets)
+				.set({
+					value:
+					currentBudget.value.map(b => (
 						b.category === data.category
 							? ({
 								...b,
@@ -211,9 +195,40 @@ async function _updateTransactionById({id, data}: {id: string; data: typeof tran
 								remain: b.remain - changedAmount,
 							})
 							: b)),
-			});
+				});
 
-		await Promise.all([updateTransaction, updateBudget]);
+			await Promise.all([updateTransaction, updateBudget]);
+		} else {
+			const updateBudget = tx
+				.update(budgets)
+				.set({
+					value:
+					currentBudget.value.map(b => (
+						b.category === currentTransaction.category
+							? ({
+								...b,
+								current: b.current - data.amount,
+								remain: b.remain + data.amount,
+							})
+							: b)),
+				});
+
+			const updateBudget2 = tx
+				.update(budgets)
+				.set({
+					value:
+					currentBudget.value.map(b => (
+						b.category === data.category
+							? ({
+								...b,
+								current: b.current + data.amount,
+								remain: b.remain - data.amount,
+							})
+							: b)),
+				});
+
+			await Promise.all([updateTransaction, updateBudget, updateBudget2]);
+		}
 	});
 }
 

@@ -55,6 +55,8 @@ var monthlyBudgets = []monthlyBudget{
 	{Category: "경조사비", Budget: 1000000},
 	{Category: "문화/여행비", Budget: 1000000},
 	{Category: "비자금", Budget: 500000},
+	{Category: "저축", Budget: 500000},
+	{Category: "고정지출", Budget: 500000},
 }
 
 func UpdateBudget(ctx context.Context, client *ent.Client) error {
