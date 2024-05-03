@@ -45,7 +45,7 @@ const { transaction, user } = Astro.props;
 			type="text"
 			name="description"
 			required
-			value={transaction?.description ?? ""}
+			value={transaction?.description ? transaction.description : ""}
 		/>
 	</label>
 	<label
@@ -65,7 +65,7 @@ const { transaction, user } = Astro.props;
 			type="number"
 			name="amount"
 			required
-			value={transaction?.amount ?? undefined}
+			value={transaction?.amount ? transaction.amount : undefined}
 		/>
 	</label>
 	<label
@@ -84,7 +84,9 @@ const { transaction, user } = Astro.props;
 			})}
 			type="date"
 			name="date"
-			value={transaction?.date ?? new Date().toISOString().split("T")[0]}
+			value={transaction?.date
+				? transaction.date
+				: new Date().toISOString().split("T")[0]}
 			required
 		/>
 	</label>
@@ -102,9 +104,14 @@ const { transaction, user } = Astro.props;
 				height: "2.5rem",
 			})}
 			name="category"
-			value={transaction?.category ?? "생활비"}
 		>
-			{categories.map((i) => <option value={i}>{i}</option>)}
+			{
+				categories.map((i) => (
+					<option value={i} selected={transaction?.category === i}>
+						{i}
+					</option>
+				))
+			}
 		</select>
 	</label>
 	<label
@@ -121,9 +128,14 @@ const { transaction, user } = Astro.props;
 				height: "2.5rem",
 			})}
 			name="paymentMethod"
-			value={transaction?.paymentMethod ?? "현금"}
 		>
-			{paymentMethods.get(user)!.map((i) => <option value={i}>{i}</option>)}
+			{
+				paymentMethods.get(user)!.map((i) => (
+					<option value={i} selected={i === transaction?.paymentMethod}>
+						{i}
+					</option>
+				))
+			}
 		</select>
 	</label>
 </div>

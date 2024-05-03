@@ -24,9 +24,6 @@ export default defineConfig({
 			},
 		},
 	},
-	prefetch: {
-		defaultStrategy: 'viewport',
-	},
 	integrations: [
 		AstroPWA({
 			base: '/',
@@ -55,10 +52,6 @@ export default defineConfig({
 			workbox: {
 				navigateFallback: '/',
 				globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}'],
-			},
-			devOptions: {
-				enabled: true,
-				navigateFallbackAllowlist: [/^\//],
 			},
 			experimental: {
 				directoryAndTrailingSlashHandler: true,
