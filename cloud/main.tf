@@ -13,16 +13,17 @@ resource "aws_s3_bucket" "lambda_bucket" {
 
 # Define the binaries and their configurations in a map
 locals {
-  src_dir = "${path.module}/src"
+  src_dir   = "${abspath(path.root)}/rust"
+  build_dir = "${abspath(path.root)}/build"
   binaries = {
     "reset_budget" = {
       source_dir = "src/bin/reset_budget"
-      build_dir  = "${abspath(path.root)}/build/reset_budget"
+      build_dir  = "${local.build_dir}/x86_64-unknown-linux-musl/release"
       handler    = "reset_budget"
     },
     "fixed_payments" = {
       source_dir = "src/bin/fixed_payments"
-      build_dir  = "${abspath(path.root)}/build/fixed_payments"
+      build_dir  = "${local.build_dir}/x86_64-unknown-linux-musl/release"
       handler    = "fixed_payments"
     }
   }
@@ -30,8 +31,6 @@ locals {
 
 # Local-exec to build and zip the Go binaries
 resource "null_resource" "build" {
-  for_each = local.binaries
-
   triggers = {
     src_files_hash = sha256(join("", sort([
       for f in fileset(local.src_dir, "**/*") : filesha256("${local.src_dir}/${f}")
@@ -39,17 +38,26 @@ resource "null_resource" "build" {
   }
 
   provisioner "local-exec" {
-    working_dir = "${path.module}/${each.value.source_dir}"
-    command     = "GOOS=linux GOARCH=amd64 go build -ldflags='-s -w' -o ${each.value.build_dir}/bootstrap"
+    working_dir = local.src_dir
+    command     = "CARGO_TARGET_DIR=${local.build_dir} cargo build --release --target=x86_64-unknown-linux-musl"
+  }
+}
+
+resource "null_resource" "rename" {
+  depends_on = [null_resource.build]
+  for_each   = local.binaries
+
+  provisioner "local-exec" {
+    working_dir = each.value.build_dir
+    command     = "mkdir -p ${each.key}_dir && cp ${each.key} ${each.key}_dir/bootstrap"
   }
 }
 
 data "archive_file" "archive" {
-  for_each = local.binaries
-
-  depends_on  = [null_resource.build]
+  depends_on  = [null_resource.rename]
+  for_each    = local.binaries
   type        = "zip"
-  source_file = "${each.value.build_dir}/bootstrap"
+  source_file = "${each.value.build_dir}/${each.key}_dir/bootstrap"
   output_path = "${each.value.build_dir}/${each.key}.zip"
 }
 
@@ -79,7 +87,7 @@ resource "aws_lambda_function" "lambda" {
 
   source_code_hash = data.archive_file.archive[each.key].output_base64sha256
   function_name    = each.key
-  handler          = "bootstrap"
+  handler          = each.value.handler
   runtime          = "provided.al2023"
   role             = aws_iam_role.lambda_exec_role.arn
 
@@ -87,7 +95,7 @@ resource "aws_lambda_function" "lambda" {
 
   environment {
     variables = {
-      GO_DATABASE_URL = var.database_url
+      DATABASE_URL = var.database_url
     }
   }
 }

@@ -42,4 +42,5 @@ dev-dist
 *.tfstate.backup
 *.tfstate.lock.info
 
-cloud/build/*
+**/build/*
+**/target/*
