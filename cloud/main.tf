@@ -15,7 +15,7 @@ resource "aws_s3_bucket" "lambda_bucket" {
 locals {
   src_dir = "${path.module}/src"
   binaries = {
-    "reset_budgets" = {
+    "reset_budget" = {
       source_dir = "src/bin/reset_budget"
       build_dir  = "${abspath(path.root)}/build/reset_budget"
       handler    = "reset_budget"
@@ -40,7 +40,7 @@ resource "null_resource" "build" {
 
   provisioner "local-exec" {
     working_dir = "${path.module}/${each.value.source_dir}"
-    command     = "GOOS=linux GOARCH=amd64 go build -ldflags='-s -w' -o ${each.value.build_dir}/${each.key}"
+    command     = "GOOS=linux GOARCH=amd64 go build -ldflags='-s -w' -o ${each.value.build_dir}/bootstrap"
   }
 }
 
@@ -49,7 +49,7 @@ data "archive_file" "archive" {
 
   depends_on  = [null_resource.build]
   type        = "zip"
-  source_file = "${each.value.build_dir}/${each.key}"
+  source_file = "${each.value.build_dir}/bootstrap"
   output_path = "${each.value.build_dir}/${each.key}.zip"
 }
 
@@ -79,8 +79,8 @@ resource "aws_lambda_function" "lambda" {
 
   source_code_hash = data.archive_file.archive[each.key].output_base64sha256
   function_name    = each.key
-  handler          = each.value.handler
-  runtime          = "go1.x"
+  handler          = "bootstrap"
+  runtime          = "provided.al2023"
   role             = aws_iam_role.lambda_exec_role.arn
 
   filename = data.archive_file.archive[each.key].output_path
