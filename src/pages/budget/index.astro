@@ -2,7 +2,7 @@
 import { getBudgets } from "lib/server";
 import Layout from "../_layout.astro";
 import { css } from "css";
-import {nanoid} from "nanoid";
+import { nanoid } from "nanoid";
 
 const budgets = await getBudgets({
 	traceId: nanoid(),
@@ -47,7 +47,7 @@ const budgets = await getBudgets({
 			>
 				{
 					budgets !== undefined
-						? budgets.value.map((b) => (
+						? budgets.map((b) => (
 								<tr>
 									<td
 										class={css({
@@ -59,9 +59,26 @@ const budgets = await getBudgets({
 										{b.category}
 									</td>
 									<td>{b.current.toLocaleString()}</td>
-									<td>{b.budget.toLocaleString()}</td>
-									<td class={css({ paddingRight: "1rem" })}>
-										{b.remain.toLocaleString()}
+									<td>
+										<input
+											class={css({
+												border: "none",
+												textAlign: "right",
+											})}
+											type="number"
+											value={b.budget}
+										/>
+									</td>
+									<td>
+										<input
+											class={css({
+												paddingRight: "1rem",
+												border: "none",
+												textAlign: "right",
+											})}
+											type="number"
+											value={b.remain}
+										/>
 									</td>
 								</tr>
 							))

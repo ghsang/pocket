@@ -1,9 +1,10 @@
 import {
-	desc, eq, gte, lt, sum,
+	desc, eq, gt, gte, lt, sql, sum,
 } from 'drizzle-orm';
-import type {Category} from 'lib/client';
 import pino from 'pino';
-import {transactions, database, budgets} from '../drizzle';
+import {
+	transactions, database, budgets, type Transaction,
+} from '../drizzle';
 
 export const observable = <Arguments extends Record<string, unknown>, Return>({spanId, command}: {
 	spanId: string;
@@ -74,35 +75,11 @@ export const getPagedTransactions = observable({
 
 async function _createTransaction(data: typeof transactions.$inferInsert): Promise<{id: string}> {
 	return database.transaction(async tx => {
-		const current = await tx.query.budgets.findFirst();
-
 		const createTransaction_ = tx.insert(transactions).values(data).returning({id: transactions.id});
 
-		if (current === undefined) {
-			throw new Error('Budgets not found');
-		}
-
-		const isCategoryNotExist = !current.value.some(b => b.category === data.category);
-
-		if (isCategoryNotExist) {
-			throw new Error('Category not found');
-		}
-
-		const updateBudget = tx.update(budgets)
-			.set({
-				value: current.value.map(b => (
-					b.category === data.category
-						? ({
-							...b,
-							current: b.current + data.amount,
-							remain: b.remain - data.amount,
-						})
-						: b)),
-			});
-
-		const [,transaction] = await Promise.all([
-			updateBudget,
+		const [transaction] = await Promise.all([
 			createTransaction_,
+			updateBudget({tx, category: data.category, amount: data.amount}),
 		]);
 
 		return transaction[0]!;
@@ -128,29 +105,29 @@ export const getTransactionById = observable({
 
 async function _deleteTransactionById({id}: {id: string}) {
 	return database.transaction(async tx => {
-		const current = await tx.query.budgets.findFirst();
-
 		const data = await tx.query.transactions.findFirst({
 			where: eq(transactions.id, id),
 		});
 
 		await Promise.all([
-			tx.update(budgets)
-				.set({
-					value: current!.value.map(b => (
-						b.category === data!.category
-							? ({
-								...b,
-								current: b.current - data!.amount,
-								remain: b.remain + data!.amount,
-							})
-							: b)),
-				}),
+			updateBudget({tx, category: data!.category, amount: -data!.amount}),
 			tx
 				.delete(transactions)
 				.where(eq(transactions.id, id)),
 		]);
 	});
+}
+
+async function updateBudget({tx, category, amount}: {
+	tx: Transaction;
+	category: string;
+	amount: number;
+}) {
+	await tx.update(budgets)
+		.set({
+			remain: sql`${budgets.remain} + ${amount}`,
+		})
+		.where(eq(budgets.category, category));
 }
 
 export const deleteTransactionById = observable({
@@ -183,51 +160,13 @@ async function _updateTransactionById({id, data}: {id: string; data: typeof tran
 		if (currentTransaction.category === data.category) {
 			const changedAmount = data.amount - currentTransaction.amount;
 
-			const updateBudget = tx
-				.update(budgets)
-				.set({
-					value:
-					currentBudget.value.map(b => (
-						b.category === data.category
-							? ({
-								...b,
-								current: b.current + changedAmount,
-								remain: b.remain - changedAmount,
-							})
-							: b)),
-				});
-
-			await Promise.all([updateTransaction, updateBudget]);
+			await Promise.all([updateTransaction, updateBudget({tx, category: data.category, amount: changedAmount})]);
 		} else {
-			const updateBudget = tx
-				.update(budgets)
-				.set({
-					value:
-					currentBudget.value.map(b => (
-						b.category === currentTransaction.category
-							? ({
-								...b,
-								current: b.current - data.amount,
-								remain: b.remain + data.amount,
-							})
-							: b)),
-				});
-
-			const updateBudget2 = tx
-				.update(budgets)
-				.set({
-					value:
-					currentBudget.value.map(b => (
-						b.category === data.category
-							? ({
-								...b,
-								current: b.current + data.amount,
-								remain: b.remain - data.amount,
-							})
-							: b)),
-				});
-
-			await Promise.all([updateTransaction, updateBudget, updateBudget2]);
+			await Promise.all([
+				updateTransaction,
+				updateBudget({tx, category: currentTransaction.category, amount: -currentTransaction.amount}),
+				updateBudget({tx, category: data.category, amount: data.amount}),
+			]);
 		}
 	});
 }
@@ -238,43 +177,29 @@ export const updateTransactionById = observable({
 });
 
 async function _getBudgets() {
-	return database.query.budgets.findFirst();
+	return database.transaction(async tx => {
+		const budgets = await tx.query.budgets.findMany();
+
+		const currentByCategory = await tx.select({
+			category: transactions.category,
+			value: sum(transactions.amount).mapWith(Number),
+		})
+			.from(transactions)
+			.groupBy(transactions.category)
+			.where(gt(transactions.date, firstDayOfMonth()));
+
+		return budgets.map(b => ({
+			category: b.category,
+			current: currentByCategory.find(c => c.category === b.category)?.value ?? 0,
+			budget: b.budget,
+			remain: b.remain,
+		}));
+	});
 }
 
 export const getBudgets = observable({
 	spanId: 'getBudgets',
 	command: _getBudgets,
-});
-
-async function _updateBudgets({category, amountChange}: {
-	category: Category;
-	amountChange: number;
-}) {
-	await database.transaction(async tx => {
-		const current = await tx.query.budgets.findFirst();
-
-		if (current === undefined) {
-			throw new Error('Budgets not found');
-		}
-
-		return tx
-			.update(budgets)
-			.set({
-				value: current.value.map(b => (
-					b.category === category.toString()
-						? ({
-							...b,
-							current: b.current + amountChange,
-							remain: b.remain - amountChange,
-						})
-						: b)),
-			});
-	});
-}
-
-export const updateBudgets = observable({
-	spanId: 'updateBudgets',
-	command: _updateBudgets,
 });
 
 async function _getPaymentMethodInfo() {
