@@ -21,7 +21,9 @@ const budgets = await getBudgets({
 	>
 		<table
 			class={css({
-				width: "100%",
+				width: "100vw",
+				fontSize: "0.8rem",
+				tableLayout: "fixed",
 			})}
 		>
 			<thead
@@ -30,10 +32,10 @@ const budgets = await getBudgets({
 				})}
 			>
 				<tr>
-					<th class={css({ paddingY: "1rem", paddingLeft: "1rem" })}>분류</th>
+					<th class={css({ paddingY: "1rem" })}>분류</th>
 					<th>현재</th>
 					<th>예산</th>
-					<th class={css({ paddingRight: "1rem" })}>잔액</th>
+					<th>잔액</th>
 				</tr>
 			</thead>
 			<tbody
@@ -62,6 +64,7 @@ const budgets = await getBudgets({
 									<td>
 										<input
 											class={css({
+												width: "100%",
 												border: "none",
 												textAlign: "right",
 											})}
@@ -69,10 +72,14 @@ const budgets = await getBudgets({
 											value={b.budget}
 										/>
 									</td>
-									<td>
+									<td
+										class={css({
+											paddingRight: "1rem",
+										})}
+									>
 										<input
 											class={css({
-												paddingRight: "1rem",
+												width: "100%",
 												border: "none",
 												textAlign: "right",
 											})}
