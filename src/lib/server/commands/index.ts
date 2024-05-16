@@ -1,5 +1,5 @@
 import {
-	desc, eq, gt, gte, lt, sql, sum,
+	desc, eq, gte, lt, sql, sum,
 } from 'drizzle-orm';
 import pino from 'pino';
 import {
@@ -186,7 +186,7 @@ async function _getBudgets() {
 		})
 			.from(transactions)
 			.groupBy(transactions.category)
-			.where(gt(transactions.date, firstDayOfMonth()));
+			.where(gte(transactions.date, firstDayOfMonth()));
 
 		return budgets.map(b => ({
 			category: b.category,
