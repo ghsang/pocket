@@ -1,5 +1,3 @@
-/* eslint-disable new-cap */
-/* eslint-disable camelcase */
 import {defineConfig} from 'astro/config';
 import vercel from '@astrojs/vercel/serverless';
 import AstroPWA from '@vite-pwa/astro';

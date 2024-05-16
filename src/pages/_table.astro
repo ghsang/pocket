@@ -1,7 +1,8 @@
 ---
-import { css } from "css";
 import { type TransactionDto, toDateString } from "lib/client";
+import {         css } from "css";
 
+// eslint-disable-next-line unicorn/prevent-abbreviations
 interface Props {
 	transactions: TransactionDto[];
 	hasNext: boolean;
@@ -92,22 +93,22 @@ const { transactions, hasNext } = Astro.props;
 	import { createTransactionElement, type TransactionDto } from "lib/client";
   import { nanoid } from "nanoid";
 
+	async function fetchTransactions({ startAfter }: { startAfter: string }) {
+		return (await fetch(
+			`/api/paged-transactions/${startAfter}.json`, {
+			headers: {
+				"Content-Type": "application/json",
+				"X-B3-TraceId": nanoid(),
+				"X-B3-ParentSpanId": "/pages/index/fetch-more",
+			},
+		}).then(
+			(response) => response.json(),
+		)) as { data: TransactionDto[]; startAfter: string; hasNext: boolean };
+	}
+
 	class FetchMore extends HTMLElement {
 		constructor() {
 			super();
-
-			async function fetchTransactions({ startAfter }: { startAfter: string }) {
-				return (await fetch(
-					`/api/paged-transactions/${startAfter}.json`, {
-					headers: {
-						"Content-Type": "application/json",
-						"X-B3-TraceId": nanoid(),
-						"X-B3-ParentSpanId": "/pages/index/fetch-more",
-					},
-				}).then(
-					(response) => response.json(),
-				)) as { data: TransactionDto[]; startAfter: string; hasNext: boolean };
-			}
 
 			let state = {
 				startAfter: new Date().toISOString(),
@@ -146,7 +147,7 @@ const { transactions, hasNext } = Astro.props;
 					for (const d of data) {
 						const a = createTransactionElement(template, d);
 
-						table!.appendChild(a);
+						table!.append(a);
 					}
 
 					state = { startAfter, hasNext, initial: false };

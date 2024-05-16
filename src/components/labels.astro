@@ -1,11 +1,6 @@
 ---
 import { css } from "css";
-import { categories, paymentMethods, type TransactionDto } from "lib/client";
-
-interface Props {
-	user: string;
-	transaction?: TransactionDto;
-}
+import { categories, paymentMethods } from "lib/client";
 
 const { transaction, user } = Astro.props;
 ---
@@ -45,7 +40,7 @@ const { transaction, user } = Astro.props;
 			type="text"
 			name="description"
 			required
-			value={transaction?.description ? transaction.description : ""}
+			value={transaction?.description ?? ""}
 		/>
 	</label>
 	<label
@@ -65,7 +60,7 @@ const { transaction, user } = Astro.props;
 			type="number"
 			name="amount"
 			required
-			value={transaction?.amount ? transaction.amount : undefined}
+			value={transaction?.amount ?? undefined}
 		/>
 	</label>
 	<label
@@ -85,8 +80,7 @@ const { transaction, user } = Astro.props;
 			type="date"
 			name="date"
 			value={transaction?.date
-				? transaction.date
-				: new Date().toISOString().split("T")[0]}
+				?? new Date().toISOString().split("T")[0]}
 			required
 		/>
 	</label>
@@ -106,9 +100,9 @@ const { transaction, user } = Astro.props;
 			name="category"
 		>
 			{
-				categories.map((i) => (
-					<option value={i} selected={transaction?.category === i}>
-						{i}
+				categories.map((index) => (
+					<option value={index} selected={transaction?.category === index}>
+						{index}
 					</option>
 				))
 			}
@@ -130,9 +124,9 @@ const { transaction, user } = Astro.props;
 			name="paymentMethod"
 		>
 			{
-				paymentMethods.get(user)!.map((i) => (
-					<option value={i} selected={i === transaction?.paymentMethod}>
-						{i}
+				paymentMethods.get(user)!.map((index) => (
+					<option value={index} selected={index === transaction?.paymentMethod}>
+						{index}
 					</option>
 				))
 			}

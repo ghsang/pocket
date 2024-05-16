@@ -9,6 +9,7 @@ import { nanoid } from "nanoid";
 const session = await getSession(Astro.request);
 
 if (!session || !session.user?.name) {
+	// eslint-disable-next-line unicorn/prefer-module
 	return Astro.redirect("/login");
 }
 
@@ -114,8 +115,8 @@ const transaction = await getTransactionById({
 
 			function getFormData() {
 				const formData = new FormData(form);
-				const tmp = Object.fromEntries(formData.entries());
-				return { ...tmp, amount: Number(tmp.amount) };
+				const temporary = Object.fromEntries(formData.entries());
+			return { ...temporary, amount: Number(temporary.amount) };
 			}
 
 			deleteButton.addEventListener("click", async (event) => {
@@ -157,24 +158,24 @@ const transaction = await getTransactionById({
 
 			let startX = 0;
 
-			body.addEventListener("touchstart", (e) => {
-				if (e.touches[0] === undefined) return;
+			body.addEventListener("touchstart", (event) => {
+				if (event.touches[0] === undefined) return;
 
-				startX = e.touches[0].clientX;
+				startX = event.touches[0].clientX;
 			});
 
 			body.addEventListener(
 				"touchmove",
-				(e) => {
-					e.preventDefault();
+				(event) => {
+					event.preventDefault();
 				},
 				{ passive: false },
 			);
 
-			body.addEventListener("touchend", (e) => {
-				if (e.changedTouches[0] === undefined) return;
+			body.addEventListener("touchend", (event) => {
+				if (event.changedTouches[0] === undefined) return;
 
-				const endX = e.changedTouches[0].clientX;
+				const endX = event.changedTouches[0].clientX;
 
 				if (startX + 50 < endX) {
 					history.back();

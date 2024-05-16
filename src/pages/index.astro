@@ -3,17 +3,18 @@ import Table from "./_table.astro";
 import FormOpenButton from "./_form-open-button.astro";
 import AddTransactionForm from "./_add-transaction-form.astro";
 import Layout from "./_layout.astro";
-import { getPagedTransactions } from "lib/server";
+import {    getPagedTransactions } from "lib/server";
 import { getSession } from "auth-astro/server";
 import {nanoid} from "nanoid";
 
 const session = await getSession(Astro.request);
 
 if (!session || session.user === undefined) {
+	// eslint-disable-next-line unicorn/prefer-module
 	return Astro.redirect("/login");
 }
 
-const props = await getPagedTransactions({
+const properties = await getPagedTransactions({
 	traceId: nanoid(),
 	parentSpanId: '/pages/index',
 	arguments_: {}
@@ -22,7 +23,7 @@ const props = await getPagedTransactions({
 
 <Layout>
 	<transaction-handler data-user={session.user.name}>
-		<Table transactions={props.data} hasNext={props.hasNext} />
+		<Table transactions={properties.data} hasNext={properties.hasNext} />
 		<FormOpenButton />
 		<AddTransactionForm user={session.user.name} />
 	</transaction-handler>
@@ -43,6 +44,11 @@ const props = await getPagedTransactions({
 		createTransactionElement,
 	} from "lib/client";
   import { nanoid } from "nanoid";
+
+	function getDateFromAnchorElement(a: HTMLAnchorElement) {
+		const span = a.querySelector("span") as HTMLSpanElement;
+		return new Date(span.dataset.date as string);
+	}
 
 	class TransactionHandler extends HTMLElement {
 		constructor() {
@@ -80,11 +86,6 @@ const props = await getPagedTransactions({
 				throw new Error("template not found");
 			}
 
-			function getDateFromAnchorElement(a: HTMLAnchorElement) {
-				const span = a.querySelector("span") as HTMLSpanElement;
-				return new Date(span.dataset.date as string);
-			}
-
 			function closeDialog() {
 				setTimeout(() => {
 					dialog.close();
@@ -103,15 +104,15 @@ const props = await getPagedTransactions({
 				event.preventDefault();
 
 				const formData = new FormData(form);
-				const tmp = Object.fromEntries(formData.entries());
-				const data = {
-					...tmp,
-					user: this.dataset!.user!,
-					amount: Number(tmp.amount),
+				const temporary = Object.fromEntries(formData.entries());
+			const data = {
+				...temporary,
+				user: this.dataset!.user!,
+				amount: Number(temporary.amount),
 				} as TransactionDao;
 
 				const table = this.querySelector(".table") as HTMLDivElement;
-				const allRows = table.getElementsByTagName("a");
+				const allRows = table.querySelectorAll("a");
 
 				const { id } = await fetch("/api/transactions.json", {
 					method: "POST",
@@ -135,7 +136,7 @@ const props = await getPagedTransactions({
 					const date = getDateFromAnchorElement(r);
 
 					if (new Date(data.date) >= date) {
-						table.insertBefore(a, r);
+						r.before(a);
 
 						inserted = true;
 
@@ -144,7 +145,7 @@ const props = await getPagedTransactions({
 				}
 
 				if (!inserted) {
-					table.appendChild(a);
+					table.append(a);
 				}
 
 				form.reset();

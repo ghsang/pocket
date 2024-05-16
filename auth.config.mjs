@@ -3,7 +3,7 @@ import {defineConfig} from 'auth-astro';
 
 export default defineConfig({
 	providers: [
-		Kakao({ // eslint-disable-line new-cap
+		Kakao({
 			clientId: import.meta.env.KAKAO_CLIENT_ID,
 			clientSecret: import.meta.env.KAKAO_CLIENT_SECRET,
 		}),

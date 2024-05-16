@@ -45,8 +45,9 @@ const paymentMethodinfo = await getPaymentMethodInfo({
 				})}
 			>
 				{
-					paymentMethodinfo !== undefined
-						? paymentMethodinfo.map((i) => (
+					paymentMethodinfo === undefined
+						? undefined
+						: paymentMethodinfo.map((index) => (
 								<tr>
 									<td
 										class={css({
@@ -55,7 +56,7 @@ const paymentMethodinfo = await getPaymentMethodInfo({
 											paddingY: "1rem",
 										})}
 									>
-										{i.user}
+										{index.user}
 									</td>
 									<td
 										class={css({
@@ -64,14 +65,13 @@ const paymentMethodinfo = await getPaymentMethodInfo({
 											paddingY: "1rem",
 										})}
 									>
-										{i.paymentMethod}
+										{index.paymentMethod}
 									</td>
 									<td class={css({ paddingRight: "1rem" })}>
-										{Number(i.amount!).toLocaleString()}
+										{Number(index.amount!).toLocaleString()}
 									</td>
 								</tr>
 							))
-						: null
 				}
 			</tbody>
 		</table>

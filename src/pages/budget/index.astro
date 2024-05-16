@@ -48,8 +48,9 @@ const budgets = await getBudgets({
 				})}
 			>
 				{
-					budgets !== undefined
-						? budgets.map((b) => (
+					budgets === undefined
+						? undefined
+						: budgets.map((b) => (
 								<tr>
 									<td
 										class={css({
@@ -89,7 +90,6 @@ const budgets = await getBudgets({
 									</td>
 								</tr>
 							))
-						: null
 				}
 			</tbody>
 		</table>

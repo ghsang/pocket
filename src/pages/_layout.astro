@@ -79,7 +79,7 @@ const navigation = [
           }
 
           function swipeLeft() {
-            if (window.location.pathname === hrefs[hrefs.length - 1]) return;
+            if (window.location.pathname === hrefs.at(-1)) return;
 
             const index = hrefs.indexOf(window.location.pathname);
 
@@ -90,16 +90,16 @@ const navigation = [
 
           let startX = 0;
 
-          body.addEventListener("touchstart", (e) => {
-            if (e.touches[0] === undefined) return;
+          body.addEventListener("touchstart", (event) => {
+            if (event.touches[0] === undefined) return;
 
-            startX = e.touches[0].clientX;
+            startX = event.touches[0].clientX;
           });
 
-          body.addEventListener("touchend", (e) => {
-            if (e.changedTouches[0] === undefined) return;
+          body.addEventListener("touchend", (event) => {
+            if (event.changedTouches[0] === undefined) return;
 
-            const endX = e.changedTouches[0].clientX;
+            const endX = event.changedTouches[0].clientX;
 
             if (startX + 50 < endX) {
               swipeRight();
