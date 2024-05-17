@@ -18,7 +18,6 @@
     "@astrojs/vercel": "^7.5.2",
     "@auth/core": "^0.18.6",
     "@pandacss/dev": "^0.37.2",
-    "@playform/compress": "^0.0.3",
     "@vercel/node": "^3.0.27",
     "@vite-pwa/assets-generator": "^0.2.4",
     "@vite-pwa/astro": "^0.3.1",
@@ -37,11 +36,11 @@
   },
   "devDependencies": {
     "@types/luxon": "^3.4.2",
-    "@typescript-eslint/parser": "^7.6.0",
+    "@types/node": "^18.0.0 || >=20.0.0",
+    "@typescript-eslint/parser": "8.0.0-alpha.13",
     "drizzle-kit": "^0.20.14",
     "eslint": "^9.2.0",
     "eslint-plugin-astro": "^1.2.0",
-    "eslint-plugin-unicorn": "^53.0.0",
-    "typescript": "^5.4.2"
+    "eslint-plugin-unicorn": "^53.0.0"
   }
 }
