@@ -1,5 +1,5 @@
 import {
-	desc, eq, gte, lt, sql, sum,
+	desc, eq, gte, lt, sql, sum, and
 } from 'drizzle-orm';
 import pino from 'pino';
 import {
@@ -57,13 +57,17 @@ async function _getPagedTransactions({startAfter = new Date(), limit = 50}: {
 	const data = await database
 		.select()
 		.from(transactions)
-		.where(startAfter ? lt(transactions.createdAt, startAfter) : undefined)
+		.where(
+			startAfter 
+				? lt(transactions.createdAt, startAfter) 
+				: undefined
+		)
 		.orderBy(desc(transactions.date), desc(transactions.createdAt))
 		.limit(limit);
 
 	return {
 		data,
-		startAfter: data ? data.map(t => t.createdAt).pop() : undefined,
+		startAfter: data ? data.map(t => t.createdAt).pop() : startAfter,
 		hasNext: data.length === limit,
 	};
 }
@@ -71,6 +75,37 @@ async function _getPagedTransactions({startAfter = new Date(), limit = 50}: {
 export const getPagedTransactions = observable({
 	spanId: 'getPagedTransactions',
 	command: _getPagedTransactions,
+});
+
+async function _getPagedTransactionsByCategory({category, startAfter = new Date(), limit = 50}: {
+	category: string;
+	startAfter?: Date;
+	limit?: number;
+}) {
+	const data = await database
+		.select()
+		.from(transactions)
+		.where(
+			and(
+				startAfter 
+					? lt(transactions.createdAt, startAfter) 
+					: undefined,
+				eq(transactions.category, category)
+			)
+		)
+		.orderBy(desc(transactions.date), desc(transactions.createdAt))
+		.limit(limit);
+
+	return {
+		data,
+		startAfter: data ? data.map(t => t.createdAt).pop() : startAfter!,
+		hasNext: data.length === limit,
+	};
+}
+
+export const getPagedTransactionsByCategory = observable({
+	spanId: 'getPagedTransactionsByCategory',
+	command: _getPagedTransactionsByCategory,
 });
 
 async function _createTransaction(data: typeof transactions.$inferInsert): Promise<{id: string}> {

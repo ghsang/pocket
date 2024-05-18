@@ -1,8 +1,8 @@
 import {registerSW} from 'virtual:pwa-register';
 
-registerSW({ // eslint-disable-line @typescript-eslint/no-unsafe-call
+registerSW({  
 	immediate: true,
-	onRegisteredSW(swScriptUrl: any) {
+	onRegisteredSW(swScriptUrl: string) {
 		console.log('SW registered:', swScriptUrl);
 	},
 	onOfflineReady() {

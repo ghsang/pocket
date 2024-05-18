@@ -9,7 +9,6 @@ import { nanoid } from "nanoid";
 const session = await getSession(Astro.request);
 
 if (!session || !session.user?.name) {
-	// eslint-disable-next-line unicorn/prefer-module
 	return Astro.redirect("/login");
 }
 

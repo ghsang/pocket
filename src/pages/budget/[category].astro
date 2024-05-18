@@ -1,11 +1,13 @@
 ---
-import Table from "./_table.astro";
-import FormOpenButton from "./_form-open-button.astro";
-import AddTransactionForm from "./_add-transaction-form.astro";
-import Layout from "./_layout.astro";
-import { getPagedTransactions } from "lib/server";
+import Table from "../_table.astro";
+import FormOpenButton from "../_form-open-button.astro";
+import AddTransactionForm from "../_add-transaction-form.astro";
+import Layout from "../_layout.astro";
+import { getPagedTransactionsByCategory } from "lib/server";
 import { getSession } from "auth-astro/server";
-import {nanoid} from "nanoid";
+import { nanoid } from "nanoid";
+
+const { category } = Astro.params;
 
 const session = await getSession(Astro.request);
 
@@ -13,10 +15,12 @@ if (!session || session.user === undefined) {
 	return Astro.redirect("/login");
 }
 
-const { data, hasNext, startAfter } = await getPagedTransactions({
+const {data, hasNext, startAfter} = await getPagedTransactionsByCategory({
 	traceId: nanoid(),
-	parentSpanId: '/pages/index',
-	arguments_: {}
+	parentSpanId: `/pages/budget/${category}`,
+	arguments_: {
+		category: category!,
+	}
 });
 ---
 
@@ -37,9 +41,9 @@ const { data, hasNext, startAfter } = await getPagedTransactions({
 </style>
 
 <script>
-	import TransactionHandler from "./_transaction-handler";
+	import TransactionHandler from "../_transaction-handler";
 
 	if (customElements.get("transaction-handler") === undefined) {
-		customElements.define("transaction-handler", TransactionHandler);
+	customElements.define("transaction-handler", TransactionHandler);
 	}
 </script>

@@ -9,7 +9,6 @@ import { getSession } from "auth-astro/server";
 const session = await getSession(Astro.request);
 
 if (session) {
-  // eslint-disable-next-line unicorn/prefer-module
   return Astro.redirect("/");
 }
 ---

@@ -35,8 +35,10 @@
     "workbox-window": "^7.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.3.0",
     "@types/luxon": "^3.4.2",
     "@types/node": "^18.0.0 || >=20.0.0",
+    "typescript-eslint": "8.0.0-alpha.13",
     "@typescript-eslint/parser": "8.0.0-alpha.13",
     "drizzle-kit": "^0.20.14",
     "eslint": "^9.2.0",

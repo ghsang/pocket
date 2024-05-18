@@ -1,22 +1,39 @@
 ---
 import { type TransactionDto, toDateString } from "lib/client";
-import {         css } from "css";
+import { css } from "css";
 
-// eslint-disable-next-line unicorn/prevent-abbreviations
 interface Props {
 	transactions: TransactionDto[];
+	startAfter: Date;
 	hasNext: boolean;
 }
 
-const { transactions, hasNext } = Astro.props;
+const { transactions, startAfter, hasNext } = Astro.props;
 ---
 
-<fetch-more data-hasnext={hasNext}>
-	<template>
+<fetch-more hasNext={hasNext} startAfter={startAfter}>
+	<template class="new">
 		<a
 			class={css({
 				paddingX: 2,
 				animation: "tempBgColorChange 0.8s ease-in-out",
+			})}
+		>
+			<span
+				class={css({
+					textAlign: "start",
+				})}></span>
+			<span></span>
+			<span
+				class={css({
+					textAlign: "end",
+				})}></span>
+		</a>
+	</template>
+	<template class="old">
+		<a
+			class={css({
+				paddingX: 2,
 			})}
 		>
 			<span
@@ -58,10 +75,10 @@ const { transactions, hasNext } = Astro.props;
 				})}
 		>
 			{
-				transactions.map((d) => (
-					<a
+				transactions.map((d, index) => (
+						<a
 						href={`/transactions/${d.id}`}
-						class={css({
+						class={`${index === (transactions.length - 10) ? "loader " : ""}` + css({
 							paddingX: 2,
 						})}
 					>
@@ -85,7 +102,6 @@ const { transactions, hasNext } = Astro.props;
 				))
 			}
 		</div>
-		<div class="loader"></div>
 	</div>
 </fetch-more>
 
@@ -111,8 +127,8 @@ const { transactions, hasNext } = Astro.props;
 			super();
 
 			let state = {
-				startAfter: new Date().toISOString(),
-				hasNext: Boolean(this.dataset.hasNext),
+				startAfter: this.getAttribute("startAfter")!,
+				hasNext: Boolean(this.getAttribute("hasNext")),
 				initial: true,
 			};
 
@@ -122,7 +138,7 @@ const { transactions, hasNext } = Astro.props;
 				throw new Error("table not found");
 			}
 
-			const template = this.querySelector("template")!;
+			const template = this.querySelector<HTMLTemplateElement>("template.old")!;
 
 			if (template === null) {
 				throw new Error("template not found");
@@ -132,11 +148,6 @@ const { transactions, hasNext } = Astro.props;
 				if (entries[0]!.isIntersecting) {
 					if (!state.hasNext) {
 						observer.disconnect();
-						return;
-					}
-
-					if (state.initial) {
-						state.initial = false;
 						return;
 					}
 

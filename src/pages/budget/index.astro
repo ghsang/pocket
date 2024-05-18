@@ -59,7 +59,14 @@ const budgets = await getBudgets({
 											paddingY: "1rem",
 										})}
 									>
-										{b.category}
+										<a
+											href={`/budget/${b.category}`}
+											class={css({
+												width: "100%",
+											})}
+										>
+											{b.category}
+										</a>
 									</td>
 									<td>{b.current.toLocaleString()}</td>
 									<td>
