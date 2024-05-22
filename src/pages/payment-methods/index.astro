@@ -1,7 +1,6 @@
 ---
 import { getPaymentMethodInfo } from "lib/server";
 import Layout from "../_layout.astro";
-import { css } from "css";
 import { nanoid } from "nanoid";
 
 const paymentMethodinfo = await getPaymentMethodInfo({
@@ -12,62 +11,28 @@ const paymentMethodinfo = await getPaymentMethodInfo({
 ---
 
 <Layout>
-	<div
-		class={css({
-			height: "80vh",
-			display: "flex",
-			alignItems: "start",
-		})}
-	>
-		<table
-			class={css({
-				width: "100%",
-			})}
-		>
-			<thead
-				class={css({
-					backgroundColor: "lime.100",
-				})}
-			>
-				<tr>
-					<th class={css({ paddingY: "1rem", paddingLeft: "1rem" })}>소유</th>
+	<div class="h-[80vh] flex items-start">
+		<table class="w-screen table-fixed">
+			<thead class="bg-lime-100">
+				<tr class="text-lg">
+					<th class="py-4">소유</th>
 					<th>결제수단</th>
-					<th class={css({ paddingRight: "1rem" })}>사용</th>
+					<th>사용</th>
 				</tr>
 			</thead>
-			<tbody
-				class={css({
-					textAlign: "right",
-					"& > * + *": {
-						borderTop: "1px solid",
-						borderColor: "gray.300",
-					},
-				})}
-			>
+			<tbody class="text-right">
 				{
 					paymentMethodinfo === undefined
 						? undefined
 						: paymentMethodinfo.map((index) => (
-								<tr>
-									<td
-										class={css({
-											textAlign: "center",
-											paddingLeft: "1rem",
-											paddingY: "1rem",
-										})}
-									>
+								<tr class="border-t-1 border-gray-300">
+									<td class="text-center pl-1 py-4">
 										{index.user}
 									</td>
-									<td
-										class={css({
-											textAlign: "center",
-											paddingLeft: "1rem",
-											paddingY: "1rem",
-										})}
-									>
+									<td class="text-center">
 										{index.paymentMethod}
 									</td>
-									<td class={css({ paddingRight: "1rem" })}>
+									<td class="pr-4">
 										{Number(index.amount!).toLocaleString()}
 									</td>
 								</tr>

@@ -1,9 +1,6 @@
 ---
 import "../../index.css";
 
-import { Image } from "astro:assets";
-import loginPng from "images/kakao_login_medium_narrow.png";
-import { css } from "css";
 import { getSession } from "auth-astro/server";
 
 const session = await getSession(Astro.request);
@@ -23,21 +20,10 @@ if (session) {
   <main>
     <login-handler>
       <div
-        class={css({
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        })}
+        class="flex justify-center items-center h-screen"
       >
-        <button
-          class={"login " +
-            css({
-              padding: 0,
-              margin: 0,
-            })}
-        >
-          <Image src={loginPng} alt="kakao login" />
+        <button class="login p-0 m-0 bg-yellow-400 rounded px-2 py-2">
+          카카오 로그인
         </button>
       </div>
     </login-handler>

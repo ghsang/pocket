@@ -1,62 +1,24 @@
 ---
-import { css } from "css";
 import { categories, paymentMethods } from "lib/client";
 
 const { transaction, user } = Astro.props;
 ---
 
 <div
-	class={css({
-		display: "flex",
-		flexDirection: "column",
-		paddingX: 4,
-		paddingY: 2,
-		"& > * + *": {
-			marginTop: 2,
-		},
-		"& > *": {
-			minHeight: 0,
-		},
-		"& > label": {
-			display: "grid",
-			gridTemplateColumns: "1fr 2fr",
-		},
-	})}
+	class="flex flex-col px-4 py-2 space-y-2"
 >
-	<label
-		class={css({
-			alignItems: "center",
-		})}
-	>
+	<label class="min-h-0 items-center grid grid-cols-3">
 		<span>내용</span>
-		<input
-			class={css({
-				backgroundColor: "gray.100",
-				rounded: "sm",
-				paddingX: 2,
-				minWidth: 0,
-				height: "2.5rem",
-			})}
+		<input class="col-span-2 bg-gray-100 rounded-sm px-2 h-10"
 			type="text"
 			name="description"
 			required
 			value={transaction?.description ?? ""}
 		/>
 	</label>
-	<label
-		class={css({
-			alignItems: "center",
-		})}
-	>
+	<label class="items-center grid grid-cols-3">
 		<span>금액</span>
-		<input
-			class={css({
-				backgroundColor: "gray.100",
-				rounded: "sm",
-				paddingX: 2,
-				height: "2.5rem",
-				minWidth: 0,
-			})}
+		<input class="col-span-2 bg-gray-100 rounded-sm px-2 h-10 min-w-0"
 			type="number"
 			name="amount"
 			required
@@ -64,19 +26,11 @@ const { transaction, user } = Astro.props;
 		/>
 	</label>
 	<label
-		class={css({
-			width: "100%",
-			alignItems: "center",
-		})}
+		class="w-full items-center grid grid-cols-3"
 	>
 		<span>날짜</span>
 		<input
-			class={css({
-				backgroundColor: "gray.100",
-				rounded: "sm",
-				paddingX: 2,
-				height: "2.5rem",
-			})}
+			class="col-span-2 bg-gray-100 rounded-sm px-2 h-10"
 			type="date"
 			name="date"
 			value={transaction?.date
@@ -84,19 +38,10 @@ const { transaction, user } = Astro.props;
 			required
 		/>
 	</label>
-	<label
-		class={css({
-			alignItems: "center",
-		})}
-	>
+	<label class="items-center grid grid-cols-3">
 		<span>분류</span>
 		<select
-			class={css({
-				backgroundColor: "gray.100",
-				rounded: "sm",
-				paddingX: 2,
-				height: "2.5rem",
-			})}
+			class="col-span-2 bg-gray-100 rounded-sm px-2 h-10"
 			name="category"
 		>
 			{
@@ -108,19 +53,10 @@ const { transaction, user } = Astro.props;
 			}
 		</select>
 	</label>
-	<label
-		class={css({
-			alignItems: "center",
-		})}
-	>
+	<label class="items-center grid grid-cols-3">
 		<span>결제수단</span>
 		<select
-			class={css({
-				backgroundColor: "gray.100",
-				rounded: "sm",
-				paddingX: 2,
-				height: "2.5rem",
-			})}
+			class="col-span-2 bg-gray-100 rounded-sm px-2 h-10"
 			name="paymentMethod"
 		>
 			{

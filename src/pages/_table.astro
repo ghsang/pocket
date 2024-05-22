@@ -1,6 +1,6 @@
 ---
+import {cn} from "@/lib/utils";
 import { type TransactionDto, toDateString } from "lib/client";
-import { css } from "css";
 
 interface Props {
 	transactions: TransactionDto[];
@@ -14,88 +14,39 @@ const { transactions, startAfter, hasNext } = Astro.props;
 <fetch-more hasNext={hasNext} startAfter={startAfter}>
 	<template class="new">
 		<a
-			class={css({
-				paddingX: 2,
-				animation: "tempBgColorChange 0.8s ease-in-out",
-			})}
+			class="animate-new grid grid-cols-4 py-4 px-4 w-screen justify-between odd:bg-gray-100"
 		>
-			<span
-				class={css({
-					textAlign: "start",
-				})}></span>
-			<span></span>
-			<span
-				class={css({
-					textAlign: "end",
-				})}></span>
+			<span class="text-left"></span>
+			<span class="col-span-2"></span>
+			<span class="text-right"></span>
 		</a>
 	</template>
 	<template class="old">
-		<a
-			class={css({
-				paddingX: 2,
-			})}
-		>
-			<span
-				class={css({
-					textAlign: "start",
-				})}></span>
-			<span></span>
-			<span
-				class={css({
-					textAlign: "end",
-				})}></span>
+		<a class="grid grid-cols-4 py-4 px-4 w-screen justify-between odd:bg-gray-100">
+			<span class="text-left"></span>
+			<span class="col-span-2"></span>
+			<span class="text-right"></span>
 		</a>
 	</template>
-	<div
-		class={css({
-			fontSize: "md",
-			textAlign: "center",
-			borderCollapse: "collapse",
-			borderSpacing: 0,
-			width: "100vw",
-			height: "90vh",
-			overflowY: "auto",
-			paddingBottom: "5rem",
-		})}
-	>
-		<div
-			class={"table " +
-				css({
-					"& > *": {
-						display: "grid",
-						gridTemplateColumns: "1fr 4fr 2fr",
-						paddingY: "1rem",
-						width: "100vw",
-						justifyContent: "space-between",
-						_odd: {
-							backgroundColor: "gray.100",
-						},
-					},
-				})}
-		>
+	<div class="text-center border-collapse border-spacing-0 w-screen h-[90vh] overflow-y-auto pb-4">
+		<div class="table">
 			{
 				transactions.map((d, index) => (
 						<a
 						href={`/transactions/${d.id}`}
-						class={`${index === (transactions.length - 10) ? "loader " : ""}` + css({
-							paddingX: 2,
-						})}
+						class={cn(
+							"grid grid-cols-4 py-4 px-4 w-screen justify-between odd:bg-gray-100",
+							index === (transactions.length - 10) ? "loader" : "",
+						)}
 					>
-						<span
-							class={css({
-								textAlign: "start",
-							})}
+						<span 
+							class="text-left"
 							data-date={d.date}
 						>
 							{toDateString(d.date)}
 						</span>
-						<span>{d.description}</span>
-						<span
-							class={css({
-								textAlign: "end",
-							})}
-						>
+						<span class="col-span-2">{d.description}</span>
+						<span class="text-right">
 							{d.amount.toLocaleString()}
 						</span>
 					</a>

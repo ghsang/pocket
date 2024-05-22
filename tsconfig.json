@@ -1,15 +1,18 @@
 {
   "extends": "astro/tsconfigs/strictest",
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "css": ["./styled-system/css"],
-      "components/*": ["./src/components/*"],
-      "lib/client": ["./src/lib/client"],
-      "lib/server": ["./src/lib/server"],
-      "lib/share": ["./src/lib/share"],
-      "images/*": ["./src/images/*"]
-    }
+      "@/*": [
+        "./*"
+      ],
+    },
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   },
-  "include": ["./src/", "vite-plugin-pwa/vanillajs", "vite-plugin-pwa/info"]
+  "include": [
+    "./src/",
+    "vite-plugin-pwa/vanillajs",
+    "vite-plugin-pwa/info"
+  ]
 }

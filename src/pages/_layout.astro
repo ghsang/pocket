@@ -1,6 +1,6 @@
 ---
+import {cn} from "@/lib/utils";
 import "../index.css";
-import { css } from "css";
 import { ViewTransitions } from "astro:transitions";
 import { pwaInfo } from "virtual:pwa-info";
 
@@ -24,32 +24,22 @@ const navigation = [
     <script src="/src/pwa.ts"></script>
     <ViewTransitions />
   </head>
-  <body>
+  <body class="w-screen h-screen">
     <header
-      class={css({
-        height: "10vh",
-        display: "fixed",
-        top: 0,
-      })}
+      class="h-[10vh] w-full fixed top-0"
     >
       <nav
-        class={css({
-          display: "flex",
-          justifyContent: "space-around",
-          alignItems: "center",
-          height: "100%",
-          fontSize: "xl",
-        })}
+        class="flex justify-around items-center h-full text-xl"
       >
         {
           navigation.map(({ href, label }) => (
             <a
               href={href}
-              class={css({
-                borderColor: active(href) ? "teal.500" : "",
-                borderBottomWidth: active(href) ? "4px" : "0",
-                marginTop: active(href) ? "2px" : "0",
-              })}
+              class={cn(
+                "z-10",
+                active(href) ? "border-teal-500 border-b-4 mt-1" :"border-b-0 mt-0",
+
+              )}
             >
               {label}
             </a>
@@ -57,7 +47,7 @@ const navigation = [
         }
       </nav>
     </header>
-    <main transition:animate="slide">
+    <main transition:animate="slide" class="mt-[10vh]">
       <swipe-navigation></swipe-navigation>
       <slot />
     </main>

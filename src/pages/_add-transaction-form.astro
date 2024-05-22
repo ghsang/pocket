@@ -1,57 +1,20 @@
 ---
-import { css } from "css";
 import Labels from "components/labels.astro";
 
 const { user } = Astro.props;
 ---
 
 <dialog
-	class={css({
-		width: "100vw",
-		height: "100vh",
-		maxHeight: "100vh",
-		maxWidth: "100vw",
-		backgroundColor: "rgba(0, 0, 0, 0.5)",
-	})}
+	class="backdrop:bg-black/50 m-0"
 >
 	<form
 		id="add-transaction-form"
-		class={css({
-			position: "fixed",
-			bottom: 0,
-			backgroundColor: "white",
-			fontSize: "md",
-			paddingTop: 2,
-			shadow: "0px -5px 15px 0px rgba(0, 0, 0, 0.3)",
-			width: "100%",
-			roundedTop: "md",
-			animation: "slideFromBottom 0.2s ease-out",
-		})}
+		class="fixed bottom-0 bg-white text-md pt-2 shadow-md w-full rounded-t-md animate-slide-from-bottom"
 	>
 		<Labels user={user} />
-		<div
-			class={css({
-				height: "5rem",
-				display: "flex",
-				paddingX: 2,
-				paddingTop: 2,
-				paddingBottom: 4,
-			})}
-		>
+		<div class="flex px-2 pt-2 pb-4">
 			<button
-				class={css({
-					height: "100%",
-					width: "100%",
-					fontSize: "xl",
-					fontWeight: "bold",
-					rounded: "md",
-					boxShadow: "xl",
-					backgroundColor: "black",
-					color: "white",
-					_active: {
-						scale: 0.98,
-					},
-				})}
+				class="py-4 h-full w-full text-xl font-bold rounded shadow-xl bg-black text-white active:scale-98"
 			>
 				등록하기
 			</button>

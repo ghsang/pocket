@@ -1,7 +1,6 @@
 ---
 import "../../index.css";
 import Labels from "components/labels.astro";
-import { css } from "css";
 import { getTransactionById } from "lib/server";
 import { getSession } from "auth-astro/server";
 import { nanoid } from "nanoid";
@@ -32,59 +31,22 @@ const transaction = await getTransactionById({
 		<detail-form-handler>
 			<form
 				data-id={id}
-				class={css({
-					height: "100vh",
-					display: "flex",
-					flexDirection: "column",
-					justifyContent: "center",
-				})}
+				class="h-screen flex flex-col justify-center"
 			>
 				{
 					transaction && (
 						<Labels transaction={transaction} user={session.user.name} />
 					)
 				}
-				<div
-					class={css({
-						marginTop: "2rem",
-						display: "flex",
-						justifyContent: "space-between",
-					})}
-				>
+				<div class="mt-4 flex justify-between">
 					<button
 						id="delete-transaction-button"
-						class={"delete-button " +
-							css({
-								width: "100%",
-								marginX: "0.3rem",
-								backgroundColor: "red.600",
-								color: "white",
-								border: "none",
-								padding: "0.5rem",
-								cursor: "pointer",
-								rounded: "md",
-								_active: {
-									scale: 0.98,
-								},
-							})}
+						class="delete-button w-full mx-1 bg-red-600 text-white border-none py-3 cursor-pointer rounded active:scale-98"
 					>
 						삭제
 					</button>
 					<button
-						class={"modify-button " +
-							css({
-								width: "100%",
-								marginX: "0.3rem",
-								backgroundColor: "teal.600",
-								color: "white",
-								border: "none",
-								padding: "0.5rem",
-								cursor: "pointer",
-								rounded: "md",
-								_active: {
-									scale: 0.98,
-								},
-							})}
+						class="modify-button w-full mx-1 bg-teal-600 text-white border-none py-3 cursor-pointer rounded active:scale-98"
 					>
 						수정
 					</button>

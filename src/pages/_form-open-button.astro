@@ -1,39 +1,11 @@
 ---
-import { css } from "css";
 ---
 
 <div
-	class={"form-open " +
-		css({
-			position: "absolute",
-			bottom: 0,
-			width: "100vw",
-			height: "5rem",
-			fontSize: "xl",
-			fontWeight: "bold",
-			display: "flex",
-			flexDirection: "column",
-			justifyContent: "center",
-			alignItems: "center",
-			paddingX: 2,
-			paddingTop: 2,
-			paddingBottom: 4,
-		})}
+	class="form-open absolute bottom-0 w-screen h-20 text-xl font-bold flex flex-col justify-center items-center px-2 pt-2 pb-4"
 >
 	<button
-		class={"form-open " +
-			css({
-				height: "100%",
-				width: "100%",
-				rounded: "md",
-				backgroundColor: "black",
-				color: "white",
-				boxShadow: "xl",
-				zIndex: 10,
-				_active: {
-					scale: 0.98,
-				},
-			})}
+		class="form-open h-full w-full rounded bg-black text-white shadow-xl z-10 active:scale-98"
 	>
 		추가
 	</button>
