@@ -1,72 +1,15 @@
 use sea_query::*;
 use sqlx::{Error, Pool, Postgres};
 
-pub enum BudgetIden {
-    Table,
-    Category,
-    Remain,
-    Budget,
-}
-
-impl Iden for BudgetIden {
-    fn unquoted(&self, s: &mut dyn std::fmt::Write) {
-        write!(
-            s,
-            "{}",
-            match self {
-                Self::Table => "budgets",
-                Self::Category => "category",
-                Self::Remain => "remain",
-                Self::Budget => "budget",
-            }
-        )
-        .unwrap();
-    }
-}
-
-#[derive(sqlx::FromRow)]
-struct Budget {
-    remain: i32,
-    budget: i32,
-}
-
 const CATEGORIES: [&str; 7] = [
     "생활비",
     "용돈",
     "경조사비",
-    "문화/여행비",
+    "문화여행비",
     "비자금",
     "저축",
     "고정지출",
 ];
-
-pub async fn reset_budget(pool: Pool<Postgres>) -> Result<(), Error> {
-    for category in CATEGORIES.iter() {
-        let get_budget = Query::select()
-            .from(BudgetIden::Table)
-            .and_where(Expr::col(BudgetIden::Category).eq(category.to_owned()))
-            .to_owned();
-
-        let budget = sqlx::query_as::<_, Budget>(&get_budget.to_string(PostgresQueryBuilder))
-            .fetch_one(&pool)
-            .await?;
-
-        let find_budget = Query::update()
-            .table(BudgetIden::Table)
-            .values([
-                (BudgetIden::Remain, (budget.remain + budget.budget).into()),
-                (BudgetIden::Budget, budget.budget.into()),
-            ])
-            .and_where(Expr::col(BudgetIden::Category).eq(category.to_owned()))
-            .to_owned();
-
-        sqlx::query(&find_budget.to_string(PostgresQueryBuilder))
-            .execute(&pool)
-            .await?;
-    }
-
-    Ok(())
-}
 
 struct Transaction {
     user: &'static str,

@@ -1,7 +1,7 @@
 import type {APIContext} from 'astro';
-import {getBudgets} from 'lib/server';
+import {createBudget} from 'lib/server';
 
-export async function GET({request}: APIContext) {
+export async function POST({request}: APIContext) {
 	const parentSpanId = request.headers.get('X-B3-ParentSpanId');
 
 	if (!parentSpanId) {
@@ -14,16 +14,18 @@ export async function GET({request}: APIContext) {
 		throw new Error('Missing X-B3-TraceId header');
 	}
 
-	const budgets = await getBudgets({
+	const body = await request.json();
+
+	await createBudget({
 		traceId,
 		parentSpanId,
-		arguments_: {},
+		arguments_: body,
 	});
 
 	return new Response(
-		JSON.stringify(budgets),
+		JSON.stringify({ok: true}),
 		{
-			status: 200,
+			status: 201,
 			headers: {
 				'content-type': 'application/json',
 			},

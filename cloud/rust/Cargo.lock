@@ -1152,20 +1152,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "reset_budget"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aws_lambda_events",
- "commands",
- "lambda_runtime",
- "serde",
- "serde_json",
- "sqlx",
- "tokio",
-]
-
-[[package]]
 name = "ring"
 version = "0.17.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"

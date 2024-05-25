@@ -126,6 +126,62 @@ export const createTransaction = observable({
 	command: _createTransaction,
 });
 
+async function _createBudget({category, amount}: { category: string, amount: number}) {
+	const yyyymm = getCurrentYYYYMM();
+
+	await database.transaction(async tx => {
+		const latest = await tx.query.budgets.findFirst({
+			orderBy: desc(budgets.yyyymm),
+			where: eq(budgets.category, category),
+		});
+
+		if (latest === undefined) {
+			await tx.insert(budgets).values({
+				yyyymm,
+				category,
+				remain: amount,
+				budget: amount,
+			});
+			return;
+		}
+
+		if (latest.yyyymm !== yyyymm) {
+			await tx.insert(budgets).values({
+				yyyymm,
+				category,
+				remain: latest.remain + amount,
+				budget: amount,
+			});
+			return;
+		}
+
+		await tx.update(budgets)
+			.set({
+				budget: amount,
+				remain: latest.remain + (amount - latest.budget),
+			})
+			.where(
+				and(
+					eq(budgets.yyyymm, yyyymm),
+					eq(budgets.category, category),
+				)
+			);
+	});
+}
+
+function getCurrentYYYYMM() {
+	const now = new Date();
+	const year = now.getFullYear();
+	const month = String(now.getMonth() + 1).padStart(2, '0');
+
+	return `${year}${month}`;
+}
+
+export const createBudget = observable({
+	spanId: 'createBudget',
+	command: _createBudget,
+});
+
 async function _getTransactionById({id}: {id: string}) {
 	return database.query.transactions
 		.findFirst({
@@ -158,11 +214,45 @@ async function updateBudget({tx, category, amount}: {
 	category: string;
 	amount: number;
 }) {
+	const yyyymm = getCurrentYYYYMM();
+
+	await database.transaction(async tx => {
+		const latest = await tx.query.budgets.findFirst({
+			orderBy: desc(budgets.yyyymm),
+			where: eq(budgets.category, category),
+		});
+
+		if (latest === undefined) {
+			await tx.insert(budgets).values({
+				yyyymm,
+				category,
+				remain: amount,
+				budget: 0,
+			});
+			return;
+		}
+
+		if (latest.yyyymm !== yyyymm) {
+			await tx.insert(budgets).values({
+				yyyymm,
+				category,
+				remain: latest.remain + amount,
+				budget: 0,
+			});
+			return;
+		}
+	});
+
 	await tx.update(budgets)
 		.set({
 			remain: sql`${budgets.remain} + ${amount}`,
 		})
-		.where(eq(budgets.category, category));
+		.where(
+			and(
+				eq(budgets.yyyymm, yyyymm),
+				eq(budgets.category, category)
+			)
+		);
 }
 
 export const deleteTransactionById = observable({
@@ -213,7 +303,9 @@ export const updateTransactionById = observable({
 
 async function _getBudgets() {
 	return database.transaction(async tx => {
-		const budgets = await tx.query.budgets.findMany();
+		const budget = await tx.query.budgets.findMany({
+			where: eq(budgets.yyyymm, getCurrentYYYYMM()),
+		});
 
 		const currentByCategory = await tx.select({
 			category: transactions.category,
@@ -223,7 +315,7 @@ async function _getBudgets() {
 			.groupBy(transactions.category)
 			.where(gte(transactions.date, firstDayOfMonth()));
 
-		return budgets.map(b => ({
+		return budget.map(b => ({
 			category: b.category,
 			current: currentByCategory.find(c => c.category === b.category)?.value ?? 0,
 			budget: b.budget,

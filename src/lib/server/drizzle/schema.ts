@@ -1,5 +1,6 @@
 import {
 	pgTable, uuid, text, date, integer, pgEnum, timestamp, index,
+	primaryKey,
 } from 'drizzle-orm/pg-core';
 import {categories} from 'lib/client';
 
@@ -20,7 +21,12 @@ export const transactions = pgTable('transactions', {
 }));
 
 export const budgets = pgTable('budgets', {
-	category: category('category').primaryKey(),
+	yyyymm: text('yyyymm'),
+	category: category('category'),
 	remain: integer('remain').notNull(),
 	budget: integer('budget').notNull(),
+}, (table) => {
+	return {
+		pk: primaryKey({ columns: [table.yyyymm, table.category]}),
+	}
 });

@@ -1,0 +1,1 @@
+ALTER TYPE "category" ADD VALUE '문화여행비';

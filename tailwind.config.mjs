@@ -74,12 +74,34 @@ module.exports = {
             transform: "translateY(0)",
           },
         },
+        "slide-from-top": {
+          from: {
+            transform: "translateY(-100%)",
+            opacity: 0,
+          },
+          to: {
+            transform: "translateY(0)",
+            opacity: 1,
+          },
+        },
+        "slide-to-right": {
+          from: {
+            transform: "translateX(0)",
+            opacity: 1,
+          },
+          to: {
+            transform: "translateX(100%)",
+            opacity: 0,
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "new": "new 0.8s ease-in-out",
         "slide-from-bottom": "slide-from-bottom 0.3s ease-out",
+        "slide-from-top": "slide-from-top 0.3s ease-in",
+        "slide-to-right": "slide-to-right 0.2s ease-out",
       },
     },
   },

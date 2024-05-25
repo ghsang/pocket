@@ -36,6 +36,27 @@
       "when": 1715083820577,
       "tag": "0004_high_doctor_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1716605454624,
+      "tag": "0005_breezy_nico_minoru",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1716605685588,
+      "tag": "0008_wooden_phalanx",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1716606108717,
+      "tag": "0009_windy_diamondback",
+      "breakpoints": true
     }
   ]
 }

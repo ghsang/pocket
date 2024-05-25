@@ -16,11 +16,6 @@ locals {
   src_dir   = "${abspath(path.root)}/rust"
   build_dir = "${abspath(path.root)}/build"
   binaries = {
-    "reset_budget" = {
-      source_dir = "src/bin/reset_budget"
-      build_dir  = "${local.build_dir}/x86_64-unknown-linux-musl/release"
-      handler    = "reset_budget"
-    },
     "fixed_payments" = {
       source_dir = "src/bin/fixed_payments"
       build_dir  = "${local.build_dir}/x86_64-unknown-linux-musl/release"

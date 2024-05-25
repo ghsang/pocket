@@ -34,7 +34,7 @@ export default class TransactionHandler extends HTMLElement {
 			throw new Error("dialog not found");
 		}
 
-		const form = this.querySelector("form") as HTMLFormElement;
+		const form = this.querySelector("form.add-transaction") as HTMLFormElement;
 
 		if (form === null) {
 			throw new Error("form not found");

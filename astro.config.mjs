@@ -2,7 +2,6 @@ import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel/serverless';
 import AstroPWA from '@vite-pwa/astro';
 import auth from 'auth-astro';
-import react from "@astrojs/react";
 
 import tailwind from "@astrojs/tailwind";
 
@@ -58,7 +57,6 @@ export default defineConfig({
     }
   }), 
   auth(), 
-  react(), 
   tailwind({
     applyBaseStyles: false,
   }),

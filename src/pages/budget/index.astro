@@ -39,18 +39,10 @@ const budgets = await getBudgets({
 									</td>
 									<td>{b.current.toLocaleString()}</td>
 									<td>
-										<input 
-											class="w-full border-none text-right"
-											type="number"
-											value={b.budget}
-										/>
+										{b.budget.toLocaleString()}
 									</td>
 									<td class="pr-1">
-										<input 
-											class="w-full border-none text-right"
-											type="number"
-											value={b.remain}
-										/>
+										{b.remain.toLocaleString()}
 									</td>
 								</tr>
 							))
