@@ -1,5 +1,5 @@
 import type {APIContext} from 'astro';
-import {createBudget} from 'lib/server';
+import {createTransaction} from 'lib/server';
 
 export async function POST({request}: APIContext) {
 	const parentSpanId = request.headers.get('X-B3-ParentSpanId');
@@ -16,10 +16,12 @@ export async function POST({request}: APIContext) {
 
 	const body = await request.json();
 
-	await createBudget({
+	await createTransaction({
 		traceId,
 		parentSpanId,
-		arguments_: body,
+		arguments_: {
+			isExpense: false, ...body
+		},
 	});
 
 	return new Response(

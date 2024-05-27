@@ -1,9 +1,14 @@
 ---
 import "../../index.css";
-import Labels from "components/labels.astro";
+import ExpenseForm from "./_expense-form.astro";
+import BudgetForm from "./_budget-form.astro";
 import { getTransactionById } from "lib/server";
 import { getSession } from "auth-astro/server";
 import { nanoid } from "nanoid";
+
+interface Props {
+	id: string;
+}
 
 const session = await getSession(Astro.request);
 
@@ -13,11 +18,19 @@ if (!session || !session.user?.name) {
 
 const { id } = Astro.params;
 
+if (!id) {
+	throw new Error("Transaction ID is required");
+}
+
 const transaction = await getTransactionById({
 	traceId: nanoid(),
 	parentSpanId: "/pages/transactions/[id].astro",
 	arguments_: { id: id! },
 });
+
+if (!transaction) {
+	throw new Error("Transaction not found");
+}
 ---
 
 <html lang="en">
@@ -29,29 +42,18 @@ const transaction = await getTransactionById({
 	</head>
 	<body>
 		<detail-form-handler>
-			<form
-				data-id={id}
-				class="h-screen flex flex-col justify-center"
-			>
-				{
-					transaction && (
-						<Labels transaction={transaction} user={session.user.name} />
-					)
-				}
-				<div class="mt-4 flex justify-between">
-					<button
-						id="delete-transaction-button"
-						class="delete-button w-full mx-1 bg-red-600 text-white border-none py-3 cursor-pointer rounded active:scale-98"
-					>
-						삭제
-					</button>
-					<button
-						class="modify-button w-full mx-1 bg-teal-600 text-white border-none py-3 cursor-pointer rounded active:scale-98"
-					>
-						수정
-					</button>
-				</div>
-			</form>
+			{transaction.isExpense ? (
+				<ExpenseForm 
+					id={id} 
+					user={session.user.name} 
+					transaction={transaction} 
+				/>
+			) : (
+				<BudgetForm 
+					id={id} 
+					transaction={transaction} 
+				/>
+			)}
 		</detail-form-handler>
 	</body>
 </html>
@@ -59,20 +61,23 @@ const transaction = await getTransactionById({
 <script>
 	import { navigate } from "astro:transitions/client";
 	import { nanoid } from "nanoid";
+	import { $ } from "lib/client";
 
 	class DetailFormHandler extends HTMLElement {
 		constructor() {
 			super();
 
-			const form = this.querySelector("form") as HTMLFormElement;
+			const form = $<HTMLFormElement>(this, "form");
 
-			const deleteButton = this.querySelector(
+			const deleteButton = $<HTMLButtonElement>(
+				this,
 				".delete-button",
-			) as HTMLButtonElement;
+			);
 
-			const modifyButton = this.querySelector(
+			const modifyButton = $<HTMLButtonElement>(
+				this,
 				".modify-button",
-			) as HTMLButtonElement;
+			);
 
 			function getFormData() {
 				const formData = new FormData(form);

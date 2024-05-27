@@ -1,0 +1,53 @@
+---
+import { type TransactionDto } from 'lib/client';
+import { categories } from "lib/client";
+
+interface Props {
+	transaction?: TransactionDto | undefined;
+}
+
+const { transaction } = Astro.props;
+---
+
+<div
+	class="flex flex-col px-4 py-2 space-y-2"
+>
+	<label class="items-center grid grid-cols-3">
+		<span>분류</span>
+		<select
+			class="col-span-2 bg-gray-100 rounded-sm px-2 h-10"
+			name="category"
+		>
+			{
+				categories.map((index) => (
+					<option value={index} selected={transaction?.category === index}>
+						{index}
+					</option>
+				))
+			}
+		</select>
+	</label>
+	<label class="items-center grid grid-cols-3">
+		<span>금액</span>
+		<input class="col-span-2 bg-gray-100 rounded-sm px-2 h-10 min-w-0"
+			type="number"
+			name="amount"
+			required
+			value={transaction?.amount ?? undefined}
+		/>
+	</label>
+	<label
+		class="w-full items-center grid grid-cols-3"
+	>
+		<span>날짜</span>
+		<input
+			class="col-span-2 bg-gray-100 rounded-sm px-2 h-10"
+			type="date"
+			name="date"
+			value={transaction?.date
+				?? new Date().toISOString().split("T")[0]}
+			required
+		/>
+	</label>
+</div>
+

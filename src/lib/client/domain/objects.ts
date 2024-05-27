@@ -25,11 +25,12 @@ export const TransactionDtoSchema = v.object({
 export type TransactionDao = v.Input<typeof TransactionDaoSchema>;
 
 export type TransactionDto = {
+	isExpense: boolean;
 	id: string;
 	date: string;
-	user: string;
 	category: string;
-	description: string;
 	amount: number;
-	paymentMethod: string;
+	user: string | null;
+	description: string | null;
+	paymentMethod: string | null;
 };

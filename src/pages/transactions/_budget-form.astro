@@ -1,0 +1,31 @@
+---
+import Labels from 'components/budget-labels.astro';
+import { type TransactionDto } from 'lib/client';
+
+interface Props {
+	id: string;
+	transaction: TransactionDto;
+}
+
+const { id, transaction } = Astro.props;
+---
+
+<form
+	data-id={id}
+	class="h-screen flex flex-col justify-center"
+>
+	<Labels transaction={transaction}/>
+	<div class="mt-4 flex justify-between">
+		<button
+			id="delete-transaction-button"
+			class="delete-button w-full mx-1 bg-red-600 text-white border-none py-3 cursor-pointer rounded active:scale-98"
+		>
+			삭제
+		</button>
+		<button
+			class="modify-button w-full mx-1 bg-teal-600 text-white border-none py-3 cursor-pointer rounded active:scale-98"
+		>
+			수정
+		</button>
+	</div>
+</form>

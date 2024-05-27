@@ -1,0 +1,166 @@
+{
+  "id": "450e9a73-0232-4a81-abe2-ecf428a5c61d",
+  "prevId": "a2471ac8-9151-46d0-b109-aa35567c8ee4",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "balances": {
+      "name": "balances",
+      "schema": "",
+      "columns": {
+        "yyyymm": {
+          "name": "yyyymm",
+          "type": "varchar(6)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "category",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remain": {
+          "name": "remain",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "balances_yyyymm_category_pk": {
+          "name": "balances_yyyymm_category_pk",
+          "columns": [
+            "yyyymm",
+            "category"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "transactions": {
+      "name": "transactions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "is_expense": {
+          "name": "is_expense",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "category",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "user": {
+          "name": "user",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "payment_method": {
+          "name": "payment_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "is_expense_idx": {
+          "name": "is_expense_idx",
+          "columns": [
+            "is_expense"
+          ],
+          "isUnique": false
+        },
+        "date_idx": {
+          "name": "date_idx",
+          "columns": [
+            "date"
+          ],
+          "isUnique": false
+        },
+        "category_idx": {
+          "name": "category_idx",
+          "columns": [
+            "category"
+          ],
+          "isUnique": false
+        },
+        "payment_method_idx": {
+          "name": "payment_method_idx",
+          "columns": [
+            "payment_method"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "category": {
+      "name": "category",
+      "values": {
+        "생활비": "생활비",
+        "경조사비": "경조사비",
+        "문화여행비": "문화여행비",
+        "저축": "저축",
+        "비자금": "비자금",
+        "용돈": "용돈",
+        "고정지출": "고정지출"
+      }
+    },
+    "type": {
+      "name": "type",
+      "values": {
+        "budget": "budget",
+        "expense": "expense"
+      }
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

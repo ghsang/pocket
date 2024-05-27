@@ -52,56 +52,57 @@ const navigation = [
       <swipe-navigation></swipe-navigation>
       <slot />
     </main>
-    <script>
-      import { navigate } from "astro:transitions/client";
-
-      class SwipeNavigation extends HTMLElement {
-        constructor() {
-          super();
-
-          const hrefs = ["/", "/budget", "/payment-methods"];
-
-          function swipeRight() {
-            if (window.location.pathname === hrefs[0]) return;
-
-            const index = hrefs.indexOf(window.location.pathname);
-
-            navigate(hrefs[index - 1]!);
-          }
-
-          function swipeLeft() {
-            if (window.location.pathname === hrefs.at(-1)) return;
-
-            const index = hrefs.indexOf(window.location.pathname);
-
-            navigate(hrefs[index + 1]!);
-          }
-
-          const body = document.querySelector("body") as HTMLBodyElement;
-
-          let startX = 0;
-
-          body.addEventListener("touchstart", (event) => {
-            if (event.touches[0] === undefined) return;
-
-            startX = event.touches[0].clientX;
-          });
-
-          body.addEventListener("touchend", (event) => {
-            if (event.changedTouches[0] === undefined) return;
-
-            const endX = event.changedTouches[0].clientX;
-
-            if (startX + 50 < endX) {
-              swipeRight();
-            } else if (startX - 50 > endX) {
-              swipeLeft();
-            }
-          });
-        }
-      }
-
-      customElements.define("swipe-navigation", SwipeNavigation);
-    </script>
   </body>
 </html>
+
+<script>
+  import { navigate } from "astro:transitions/client";
+
+  class SwipeNavigation extends HTMLElement {
+    constructor() {
+      super();
+
+      const hrefs = ["/", "/budget", "/payment-methods"];
+
+      function swipeRight() {
+        if (window.location.pathname === hrefs[0]) return;
+
+        const index = hrefs.indexOf(window.location.pathname);
+
+        navigate(hrefs[index - 1]!);
+      }
+
+      function swipeLeft() {
+        if (window.location.pathname === hrefs.at(-1)) return;
+
+        const index = hrefs.indexOf(window.location.pathname);
+
+        navigate(hrefs[index + 1]!);
+      }
+
+      const body = document.querySelector("body") as HTMLBodyElement;
+
+      let startX = 0;
+
+      body.addEventListener("touchstart", (event) => {
+        if (event.touches[0] === undefined) return;
+
+        startX = event.touches[0].clientX;
+      });
+
+      body.addEventListener("touchend", (event) => {
+        if (event.changedTouches[0] === undefined) return;
+
+        const endX = event.changedTouches[0].clientX;
+
+        if (startX + 50 < endX) {
+          swipeRight();
+        } else if (startX - 50 > endX) {
+          swipeLeft();
+        }
+      });
+    }
+  }
+
+    customElements.define("swipe-navigation", SwipeNavigation);
+  </script>

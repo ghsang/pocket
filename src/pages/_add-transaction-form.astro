@@ -1,6 +1,6 @@
 ---
-import {categories} from "@/lib/client";
-import Labels from "components/labels.astro";
+import ExpenseForm from "./_expense-form.astro";
+import BudgetForm from "./_budget-form.astro";
 
 const { user } = Astro.props;
 ---
@@ -17,67 +17,16 @@ const { user } = Astro.props;
 				</div>
 			</div>
 			<div id="expense" class="tab-content">
-				<form
-					class="add-transaction"
-				>
-					<Labels user={user} />
-					<div class="flex px-2 pt-2 pb-4">
-						<button
-							class="py-4 h-full w-full text-xl font-bold rounded shadow-xl bg-black text-white active:scale-98"
-						>
-							등록하기
-						</button>
-					</div>
-				</form>
+				<ExpenseForm user={user} />
 			</div>
 			<div id="budget" class="tab-content hidden">
-				<add-budget-control>
-					<form
-						class="add-budget"
-					>
-						<div
-							class="flex flex-col px-4 py-2 space-y-8 min-h-[15.5rem] justify-center"
-						>
-							<label class="items-center grid grid-cols-3">
-								<span>분류</span>
-								<select
-									class="col-span-2 bg-gray-100 rounded-sm px-2 h-10"
-									name="category"
-								>
-									{
-										categories.map((index) => (
-											<option value={index}>
-												{index}
-											</option>
-										))
-									}
-								</select>
-							</label>
-							<label class="items-center grid grid-cols-3">
-								<span>금액</span>
-								<input class="col-span-2 bg-gray-100 rounded-sm px-2 h-10 min-w-0"
-									type="number"
-									name="amount"
-									required
-								/>
-							</label>
-						</div>
-						<div class="flex px-2 pt-2 pb-4">
-							<button
-								class="py-4 h-full w-full text-xl font-bold rounded shadow-xl bg-black text-white active:scale-98"
-							>
-								등록하기
-							</button>
-						</div>
-					</form>
-				</add-budget-control>
+				<BudgetForm />
 			</div>
 		</div>
 	</tab-control>
 </dialog>
 
 <script>
-	import { nanoid } from 'nanoid';
 	import { $, $$ } from 'lib/client';
 
 	class TabControl extends HTMLElement {
@@ -95,6 +44,7 @@ const { user } = Astro.props;
 					const tabId = tabButton.dataset.tab;
 
 					$(this, `#${tabId}`).classList.remove('hidden');
+
 					(event.target as HTMLButtonElement).classList.add('bg-white');
 				});
 			}
@@ -103,94 +53,5 @@ const { user } = Astro.props;
 
 	if (!customElements.get('tab-control')) {
 		customElements.define('tab-control', TabControl);
-	}
-
-	function showToast({ message, type }: {
-		message: string, 
-		type: 'success' | 'error', 
-	}) {
-
-		const toastContainer = document.querySelector('#toast-container');
-
-		if (toastContainer === null) {
-			throw new Error('toast container not found');
-		}
-
-		const toast = document.createElement('div');
-		toast.className = 'animate-slide-from-top px-4 py-2 rounded shadow-md text-white';
-		
-		if (type === 'success') {
-			toast.classList.add('bg-green-500');
-		} else if (type === 'error') {
-			toast.classList.add('bg-red-500');
-		} else {
-			toast.classList.add('bg-gray-500');
-		}
-		
-		toast.textContent = message;
-
-		toastContainer.append(toast);
-
-		setTimeout(() => {
-			toast.classList.add('animate-slide-to-right');
-			toast.addEventListener('animationend', () => {
-				toast.remove();
-			});
-		}, 2000);
-	}
-
-	class AddBudgetControl extends HTMLElement {
-		constructor() {
-			super();
-
-			const addBudgetForm = $<HTMLFormElement>(this, 'form');
-
-			addBudgetForm.addEventListener('submit', async (e) => {
-				e.preventDefault();
-
-				const formData = new FormData(addBudgetForm);
-
-				const data = Object.fromEntries(formData.entries());
-
-				const res = await fetch('/api/budgets.json', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-B3-ParentSpanId': 'add-budget-form',
-						'X-B3-TraceId': nanoid(),
-					},
-					body: JSON.stringify(data),
-				});
-
-				if (!res.ok) {
-					showToast({
-						message: `An error occurred: ${res.status} ${res.statusText}`,
-						type: 'error',
-					});
-					return;
-				}
-
-				const { ok, error } = await res.json();
-
-				if (!ok) {
-					showToast({
-						message: error.message,
-						type: 'error',
-					});
-					return;
-				}
-
-				showToast({
-					message: '예산이 등록되었습니다.',
-					type: 'success',
-				});
-
-				document.querySelector('dialog')!.close();
-			});
-		}
-	}
-
-	if (!customElements.get('add-budget-control')) {
-		customElements.define('add-budget-control', AddBudgetControl);
 	}
 </script>

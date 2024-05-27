@@ -57,6 +57,20 @@
       "when": 1716606108717,
       "tag": "0009_windy_diamondback",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1716807251725,
+      "tag": "0010_breezy_iron_fist",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1716809868456,
+      "tag": "0011_minor_tana_nile",
+      "breakpoints": true
     }
   ]
 }

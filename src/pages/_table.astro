@@ -12,17 +12,10 @@ const { transactions, startAfter, hasNext } = Astro.props;
 ---
 
 <fetch-more hasNext={hasNext} startAfter={startAfter}>
-	<template class="new">
+	<template>
 		<a
-			class="animate-new grid grid-cols-4 py-4 px-4 w-screen justify-between odd:bg-gray-100"
+			class="grid grid-cols-4 py-4 px-4 w-screen justify-between odd:bg-gray-100"
 		>
-			<span class="text-left"></span>
-			<span class="col-span-2"></span>
-			<span class="text-right"></span>
-		</a>
-	</template>
-	<template class="old">
-		<a class="grid grid-cols-4 py-4 px-4 w-screen justify-between odd:bg-gray-100">
 			<span class="text-left"></span>
 			<span class="col-span-2"></span>
 			<span class="text-right"></span>
@@ -35,8 +28,9 @@ const { transactions, startAfter, hasNext } = Astro.props;
 						<a
 						href={`/transactions/${d.id}`}
 						class={cn(
-							"grid grid-cols-4 py-4 px-4 w-screen justify-between odd:bg-gray-100",
+							"grid grid-cols-4 py-4 px-4 w-screen justify-between",
 							index === (transactions.length - 10) ? "loader" : "",
+							d.isExpense ? "odd:bg-gray-100" : "bg-lime-100",
 						)}
 					>
 						<span 
@@ -45,7 +39,7 @@ const { transactions, startAfter, hasNext } = Astro.props;
 						>
 							{toDateString(d.date)}
 						</span>
-						<span class="col-span-2">{d.description}</span>
+						<span class="col-span-2">{d.isExpense ? d.description : d.category}</span>
 						<span class="text-right">
 							{d.amount.toLocaleString()}
 						</span>
@@ -89,7 +83,7 @@ const { transactions, startAfter, hasNext } = Astro.props;
 				throw new Error("table not found");
 			}
 
-			const template = this.querySelector<HTMLTemplateElement>("template.old")!;
+			const template = this.querySelector<HTMLTemplateElement>("template")!;
 
 			if (template === null) {
 				throw new Error("template not found");

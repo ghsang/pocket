@@ -1,7 +1,13 @@
 ---
+import { type TransactionDto } from 'lib/client';
 import { categories, paymentMethods } from "lib/client";
 
-const { transaction, user } = Astro.props;
+interface Props {
+	user: string;
+	transaction?: TransactionDto | undefined;
+}
+
+const { user, transaction } = Astro.props;
 ---
 
 <div

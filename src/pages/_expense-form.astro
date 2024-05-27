@@ -1,0 +1,28 @@
+---
+import { type TransactionDto } from 'lib/client';
+import ExpenseLabels from "components/expense-labels.astro";
+
+interface Props {
+	user: string;
+	transaction?: TransactionDto | undefined;
+}
+
+const { user, transaction } = Astro.props;
+---
+
+<form
+	class="expense"
+>
+	<ExpenseLabels
+		user={user}
+		transaction={transaction}
+	/>
+	<div class="flex px-2 pt-2 pb-4">
+		<button
+			class="py-4 h-full w-full text-xl font-bold rounded shadow-xl bg-black text-white active:scale-98"
+		>
+			등록하기
+		</button>
+	</div>
+</form>
+
