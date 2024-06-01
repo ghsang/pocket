@@ -18,8 +18,13 @@ const navigation = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="mask-icon" href="/favicon.svg" color="#FFFFFF">
+    <meta name="msapplication-TileColor" content="#FFFFFF">
     <meta name="theme-color" content="#ffffff" />
     <title>가계부</title>
+    <meta name="description" content="가계부">
     {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
     <script src="/src/pwa.ts"></script>
     <ViewTransitions />
