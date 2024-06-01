@@ -7,6 +7,98 @@ import {
 } from "lib/client";
 import { nanoid } from "nanoid";
 
+function handleFormOpen(
+	formOpenDiv: HTMLDivElement, 
+	dialog: HTMLDialogElement
+) {
+	return () => {
+		setTimeout(() => {
+			formOpenDiv.style.display = "none";
+			dialog.showModal();
+		}, 100);
+	};
+}
+
+function closeDialog(
+	formOpenDiv: HTMLDivElement, 
+	dialog: HTMLDialogElement
+) {
+	formOpenDiv.style.display = "";
+	dialog.close();
+}
+
+function getFormData(form: HTMLFormElement) {
+	const formData = new FormData(form);
+	const temporary = Object.fromEntries(formData.entries());
+
+	return {
+		...temporary,
+		amount: Number(temporary.amount),
+	};
+}
+
+function handleSubmit(
+	table: HTMLDivElement,
+	template: HTMLTemplateElement,
+	form: HTMLFormElement,
+	formOpenDiv: HTMLDivElement,
+	dialog: HTMLDialogElement,
+	isExpense: boolean,
+	user?: string
+) {
+	return async (event: Event) => {
+			event.preventDefault();
+
+			const data = {
+				...getFormData(form),
+				user,
+				isExpense,
+			} as TransactionDao;
+
+			const allRows = table.querySelectorAll("a");
+
+			const { id } = await fetch("/api/transactions.json", {
+				method: "POST",
+				headers: { 
+					"Content-Type": "application/json",
+					"X-B3-TraceId": nanoid(),
+					"X-B3-ParentSpanId": "/pages/index/scroll",
+				},
+				body: JSON.stringify(data),
+			}).then((response) => response.json());
+
+			const a = createTransactionElement(template, {
+				id,
+				...data,
+				date: data.date.toString(),
+			} as TransactionDto);
+
+			let inserted = false;
+
+			for (const r of allRows) {
+				const date = getDateFromAnchorElement(r);
+
+				if (new Date(data.date) >= date) {
+					r.before(a);
+
+					inserted = true;
+
+					break;
+				}
+			}
+
+			if (!inserted) table.append(a);
+
+			form.reset();
+
+			closeDialog(formOpenDiv, dialog);
+
+			a.scrollIntoView({ block: "center", behavior: "smooth"});
+
+			setTimeout(() => { a.style.animation = "" }, 200);
+	}
+}
+
 export default class TransactionHandler extends HTMLElement {
 	constructor() {
 		super();
@@ -23,157 +115,32 @@ export default class TransactionHandler extends HTMLElement {
 
 		const template = $<HTMLTemplateElement>(this, "template");
 
-		function closeDialog() {
-			setTimeout(() => {
-				dialog.close();
-				formOpenDiv.style.display = "flex";
-			}, 100);
-		}
+		const table = $<HTMLDivElement>(this, ".table");
 
-		formOpenButton.addEventListener("click", () => {
-			setTimeout(() => {
-				formOpenDiv.style.display = "none";
-				dialog.showModal();
-			}, 100);
-		});
+		formOpenButton.addEventListener("click", handleFormOpen(formOpenDiv, dialog));
 
-		expenseForm.addEventListener("submit", async (event) => {
-			event.preventDefault();
+		expenseForm.addEventListener("submit", handleSubmit(
+			table,
+			template,
+			expenseForm,
+			formOpenDiv,
+			dialog,
+			true,
+			this.dataset!.user!,
+		));
 
-			const formData = new FormData(expenseForm);
-			const temporary = Object.fromEntries(formData.entries());
-
-			const data = {
-				...temporary,
-				user: this.dataset!.user!,
-				amount: Number(temporary.amount),
-			} as TransactionDao;
-
-			const table = $<HTMLDivElement>(this, ".table");
-
-			const allRows = table.querySelectorAll("a");
-
-			const { id } = await fetch("/api/transactions.json", {
-				method: "POST",
-				headers: { 
-					"Content-Type": "application/json",
-					"X-B3-TraceId": nanoid(),
-					"X-B3-ParentSpanId": "/pages/index/scroll",
-				},
-				body: JSON.stringify({
-					...data,
-					isExpense: true,
-				}),
-			}).then((response) => response.json());
-
-			const a = createTransactionElement(template, {
-				id,
-				...data,
-				date: data.date.toString(),
-			} as TransactionDto);
-
-			let inserted = false;
-
-			for (const r of allRows) {
-				const date = getDateFromAnchorElement(r);
-
-				if (new Date(data.date) >= date) {
-					r.before(a);
-
-					inserted = true;
-
-					break;
-				}
-			}
-
-			if (!inserted) {
-				table.append(a);
-			}
-
-			expenseForm.reset();
-
-			closeDialog();
-
-			a.scrollIntoView({
-				block: "center",
-				behavior: "smooth",
-			});
-
-			setTimeout(() => {
-				a.style.animation = "";
-			}, 200);
-		});
-
-		budgetForm.addEventListener("submit", async (event) => {
-			event.preventDefault();
-
-			const formData = new FormData(budgetForm);
-			const temporary = Object.fromEntries(formData.entries());
-
-			const data = {
-				...temporary,
-				user: this.dataset!.user!,
-				amount: Number(temporary.amount),
-			} as TransactionDao;
-
-			const table = $<HTMLDivElement>(this, ".table");
-
-			const allRows = table.querySelectorAll("a");
-
-			const { id } = await fetch("/api/transactions.json", {
-				method: "POST",
-				headers: { 
-					"Content-Type": "application/json",
-					"X-B3-TraceId": nanoid(),
-					"X-B3-ParentSpanId": "/pages/index/scroll",
-				},
-				body: JSON.stringify({
-					...data,
-					isExpense: false,
-				}),
-			}).then((response) => response.json());
-
-			const a = createTransactionElement(template, {
-				id,
-				...data,
-				date: data.date.toString(),
-			} as TransactionDto);
-
-			let inserted = false;
-
-			for (const r of allRows) {
-				const date = getDateFromAnchorElement(r);
-
-				if (new Date(data.date) >= date) {
-					r.before(a);
-
-					inserted = true;
-
-					break;
-				}
-			}
-
-			if (!inserted) {
-				table.append(a);
-			}
-
-			budgetForm.reset();
-
-			closeDialog();
-
-			a.scrollIntoView({
-				block: "center",
-				behavior: "smooth",
-			});
-
-			setTimeout(() => {
-				a.style.animation = "";
-			}, 200);
-		});
+		budgetForm.addEventListener("submit", handleSubmit(
+			table,
+			template,
+			budgetForm,
+			formOpenDiv,
+			dialog,
+			false,
+		));
 
 		dialog.addEventListener("click", (event) => {
 			if (event.target === dialog) {
-				closeDialog();
+				closeDialog(formOpenDiv, dialog);
 			}
 		});
 	}

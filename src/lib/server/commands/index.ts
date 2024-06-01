@@ -6,6 +6,7 @@ import {
 	transactions, database, type Transaction,
 	balances,
 } from '../drizzle';
+import type {TransactionDto} from '@/lib/client';
 
 export const observable = <Arguments extends Record<string, unknown>, Return>({spanId, command}: {
 	spanId: string;
@@ -54,8 +55,12 @@ export const observable = <Arguments extends Record<string, unknown>, Return>({s
 async function _getPagedTransactions({startAfter = new Date(), limit = 50}: {
 	startAfter?: Date | undefined;
 	limit?: number;
-}) {
-	const data = await database
+}): Promise<{
+	data: TransactionDto[];
+	startAfter: Date | undefined;
+	hasNext: boolean;
+}> {
+	const res = await database
 		.select()
 		.from(transactions)
 		.where(
@@ -65,6 +70,8 @@ async function _getPagedTransactions({startAfter = new Date(), limit = 50}: {
 		)
 		.orderBy(desc(transactions.date), desc(transactions.createdAt))
 		.limit(limit);
+
+	const data = res as TransactionDto[];
 
 	return {
 		data,
@@ -82,7 +89,11 @@ async function _getPagedTransactionsByCategory({category, startAfter = new Date(
 	category: string;
 	startAfter?: Date;
 	limit?: number;
-}) {
+}): Promise<{
+	data: TransactionDto[];
+	startAfter: Date | undefined;
+	hasNext: boolean;
+}> {
 	const data = await database
 		.select()
 		.from(transactions)
@@ -98,7 +109,7 @@ async function _getPagedTransactionsByCategory({category, startAfter = new Date(
 		.limit(limit);
 
 	return {
-		data,
+		data: data as TransactionDto[],
 		startAfter: data ? data.map(t => t.createdAt).pop() : startAfter!,
 		hasNext: data.length === limit,
 	};
@@ -131,7 +142,7 @@ async function _getTransactionById({id}: {id: string}) {
 	return database.query.transactions
 		.findFirst({
 			where: eq(transactions.id, id),
-		});
+		}) as Promise<TransactionDto>;
 }
 
 export const getTransactionById = observable({

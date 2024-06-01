@@ -3,34 +3,24 @@ import {
 	categories,
 } from './values';
 
-export const TransactionDaoSchema = v.object({
-	date: v.date(),
-	user: v.string([v.minLength(1)]),
+const base = {
+	date: v.pipe(v.string(), v.transform(Date)),
+	user: v.nullable(v.string()),
 	category: v.picklist(categories),
-	description: v.string([v.minLength(1)]),
+	description: v.nullable(v.string()),
 	amount: v.number(),
-	paymentMethod: v.string([v.minLength(1)]),
-});
+	paymentMethod: v.nullable(v.string()),
+	isExpense: v.boolean(),
+}
+
+export const TransactionDaoSchema = v.object(base);
 
 export const TransactionDtoSchema = v.object({
-	id: v.string([v.uuid()]),
-	user: v.string([v.minLength(1)]),
-	date: v.date(),
-	category: v.picklist(categories),
-	description: v.string([v.minLength(1)]),
-	amount: v.number(),
-	paymentMethod: v.string([v.minLength(1)]),
+	id: v.pipe(v.string(), v.uuid()),
+	createdAt: v.date(),
+	...base
 });
 
-export type TransactionDao = v.Input<typeof TransactionDaoSchema>;
+export type TransactionDao = v.InferInput<typeof TransactionDaoSchema>;
 
-export type TransactionDto = {
-	isExpense: boolean;
-	id: string;
-	date: string;
-	category: string;
-	amount: number;
-	user: string | null;
-	description: string | null;
-	paymentMethod: string | null;
-};
+export type TransactionDto = v.InferInput<typeof TransactionDtoSchema>;

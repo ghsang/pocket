@@ -75,8 +75,8 @@ importers:
         specifier: ^5.4.4
         version: 5.4.5
       valibot:
-        specifier: ^0.30.0
-        version: 0.30.0
+        specifier: 0.31.0-rc.7
+        version: 0.31.0-rc.7
       vite-plugin-pwa:
         specifier: ^0.20.0
         version: 0.20.0(@vite-pwa/assets-generator@0.2.4)(vite@5.2.11(@types/node@20.12.7)(lightningcss@1.24.1)(terser@5.30.3))(workbox-build@7.1.0(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -5246,8 +5246,8 @@ packages:
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
-  valibot@0.30.0:
-    resolution: {integrity: sha512-5POBdbSkM+3nvJ6ZlyQHsggisfRtyT4tVTo1EIIShs6qCdXJnyWU5TJ68vr8iTg5zpOLjXLRiBqNx+9zwZz/rA==}
+  valibot@0.31.0-rc.7:
+    resolution: {integrity: sha512-7cFx/n1F1kaPSe9pBxZO3g9PsQnhvWcQhPwE/zH5GJpQ/oMgo8HLxpfE87BEWwOqGVYNIcLIkiWfnCAbHik6uA==}
 
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
@@ -11183,7 +11183,7 @@ snapshots:
 
   v8-compile-cache-lib@3.0.1: {}
 
-  valibot@0.30.0: {}
+  valibot@0.31.0-rc.7: {}
 
   validate-npm-package-license@3.0.4:
     dependencies:

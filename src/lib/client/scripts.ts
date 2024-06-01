@@ -14,7 +14,7 @@ export function createTransactionElement(template: HTMLTemplateElement, d: Trans
 	
 	a.classList.add('animate-new');
 
-	if (!d.isExpense) {
+	if (d.isExpense === true) {
 		a.classList.add('bg-lime-100');
 		a.classList.remove('odd:bg-gray-100');
 	}
